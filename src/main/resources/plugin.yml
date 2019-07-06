@@ -1,0 +1,23 @@
+name: ${name}
+version: ${version}
+description: ${description}
+author: ${author}
+website: ${url}
+main: ${mainClass}
+api-version: 1.13
+
+commands:
+  wheel:
+    description: Interact with the wheel
+    default: true
+  donation:
+    description: Donation related commands
+    default: true
+  linktwitch:
+    description: Link twitch account to in-game
+    default: true
+  wheeleffect:
+    description: Test wheel effect
+    op: true
+    aliases: [we]
+      
