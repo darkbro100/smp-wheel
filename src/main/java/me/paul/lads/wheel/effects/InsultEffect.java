@@ -11,17 +11,23 @@ import me.paul.lads.wheel.WheelEffect;
 @GenerateEffect(description = "Insults whoever spun this wheel", key = "effect_insult", name = "Insult Player")
 public class InsultEffect extends WheelEffect {
 
-	private static final String[] messages = { "You are a fool!", "Your stream just sucks...",
-			"I wish gravity would stop working so I could float as far away from you as possible",
-			"You are the child of an oaf", "Every time you stream everyone just gets a little big sadder",
-			"The Wheel deems you a lowly being", "You might as well stop streaming", "Go jump off a building",
-			"Go outside loser", "Ever heard of going outside? You should try it", "Get a tan idiot" };
+	private static final String[] messages = {"You are a fool!", 
+			"Your stream just sucks...",
+//			"I wish gravity would stop working so I could float as far away from you as possible",
+			"You are the child of an oaf", 
+//			"Every time you stream everyone just gets a little big sadder",
+			"The Wheel deems you a lowly being", 
+			"You might as well stop streaming", 
+			"Go jump off a building",
+			"Go outside loser", 
+//			"Ever heard of going outside? You should try it", 
+			"Get a tan idiot" };
 
 	private Random random = new Random();
 	
 	@Override
 	public void play(Player spinner, Wheel spun) {
-		sendTitle(spinner, getMessage());
+		sendTitle(spinner, getMessage(), "");
 	}
 
 	public String getMessage() {

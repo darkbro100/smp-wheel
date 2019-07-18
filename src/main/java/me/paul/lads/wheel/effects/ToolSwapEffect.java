@@ -11,11 +11,13 @@ import org.bukkit.inventory.PlayerInventory;
 import me.paul.lads.wheel.GenerateEffect;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
+import net.md_5.bungee.api.ChatColor;
 
 @GenerateEffect(description = "Swaps any tools the player has in their inventory with stone ones", key = "effect_toolswap", name = "Tool Swap")
 public class ToolSwapEffect extends WheelEffect {
 
 	private List<String> tools = Arrays.asList("pickaxe", "hoe", "axe", "shovel", "sword");
+	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[Wheel of" + ChatColor.RED + ChatColor.ITALIC + " FEAR" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 	
 	@Override
 	public void play(Player spinner, Wheel spun) {
@@ -42,7 +44,7 @@ public class ToolSwapEffect extends WheelEffect {
 			}
 		}
 
-		sendTitle(spinner, "Your tools have been turned to stone!");
+		sendTitle(spinner, "Your tools", "are now stone.");
 	}
 
 }

@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SplittableRandom;
 
+import org.apache.commons.io.FileUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.reflections.Reflections;
@@ -35,12 +39,12 @@ public class WheelEffectManager {
 		Set<Class<?>> clazzes = ref.getTypesAnnotatedWith(GenerateEffect.class);
 
 		System.out.println("Found " + clazzes.size() + " classes");
-		
+
 		clazzes.forEach(clazz -> {
 			if (WheelEffect.class.isAssignableFrom(clazz)) {
 				try {
 					GenerateEffect ge = clazz.getAnnotation(GenerateEffect.class);
-					if(ge.enabled()) {
+					if (ge.enabled()) {
 						WheelEffect we = (WheelEffect) clazz.newInstance();
 						System.out.println("Found new effect: " + ge.name());
 						effects.add(we);
@@ -56,110 +60,127 @@ public class WheelEffectManager {
 		});
 
 		// Manual Registrations. Easy Effects that don't really require creating a whole
-		// new class/file for them
+		// new class/file for them\
+
+		// world, x, y, z, yaw, pitch
+		World world = Bukkit.getWorld("SMPLive2");
+		Location sky = new Location(world, -107, 256, -34, -89, 50);
+		Location cuck = new Location(world, -72, 68, -32, -179, 4);
+		String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
+				+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				broadcastTitle(spinner.getName() + " is gey :3");
+				broadcastTitle(spinner.getName() + " is gay");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(ChatColor.GOLD
-						+ "AYO! Time to go buy some Annoying Orange merch. Click the link if you need help: "); // TODO:
-																												// insert
-																												// link
+				spinner.sendMessage(prefix
+						+ " Don't you like the Annoying Orange? You should buy some merch dude. https://amzn.to/30pxb3D");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage("Congratulations!");
+				spinner.sendMessage(prefix + " Congratulations!");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(
-						"HEY! Me, the wheel, is FORCING you to go put on a Ninja vod for the rest of yo stream :3");
+				spinner.sendMessage(prefix + " You like Ninja dude? Go put on a VOD for the rest of the Stream. Now.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(
-						"It's time for you to go on the Twitterz and tweet something super dumb. A hot take, unpopular opinion, any of that dumb shit will work :D.");
+				spinner.sendMessage(prefix + " Go on Twitter and post something really dumb. Now.");
 			}
 		});
-		String[] insuranceFraud = { "Ever heard of insurance fraud?",
-				"You know it's actually pretty hard to get caught for insurance fraud?",
-				"All you have to do is sign up for multiple insurance companies",
-				"And then you claim to have been stolen from", "Listen, it's easy money. Easy profit",
-				"You'll come around. I know you will",
-				"Insurance fraud has existed since the beginning of insurance as a commercial enterprise",
-				"So many people get away with it", "Insurance fraud",
-				"Weigh the positives and negatives and get back to me.",
-				"Have you come to a decision about... ahem... our business?" };
+		effects.add(new WheelEffect() {
+			public void play(Player spinner, Wheel spun) {
+				spinner.sendMessage(prefix
+						+ " OPEN ENDED HIT. Kill anyone you desire on the server. Cannot be held against you in the court of law.");
+			}
+		});
+		String[] insuranceFraud = { prefix + " Ever heard of insurance fraud?",
+				prefix + " You know it's actually pretty hard to get caught for insurance fraud?",
+				prefix + " All you have to do is sign up for multiple insurance companies",
+				prefix + " And then you claim to have been stolen from",
+				prefix + " Listen, it's easy money. Easy profit", 
+				prefix + " You'll come around. I know you will",
+				prefix + " Insurance fraud has existed since the beginning of insurance as a commercial enterprise",
+				prefix + " So many people get away with it", 
+				prefix + " Insurance fraud",
+				prefix + " Weigh the positives and negatives and get back to me.",
+				prefix + " Have you come to a decision about... ahem... our business?", 
+				prefix + " Fuck you" };
 		effects.add(new WheelConversationEffect(Duration.hours(1), insuranceFraud));
-		String[] stealing = { "Ever wanted to have something that reuiqres you to take it from someone else?",
-				"You should try stealing some time", "You can take whatever you want and then it's yours!",
-				"There's no strings attached", "Just take anything! You can have it! Nothing says you can't!",
-				"You could take money...", "You could take material possessions...",
-				"You could take whatever your heart desires!", "Try it! Just... steal something",
-				"You know you want to", "Fuck you" };
+
+		String[] stealing = { prefix + " Ever wanted to have something that requires you to take it from someone else?",
+				prefix + " You should try stealing some time",
+				prefix + " You can take whatever you want and then it's yours!",
+				prefix + " There's no strings attached",
+				prefix + " Just take anything! You can have it! Nothing says you can't!",
+				prefix + " You could take money...", 
+				prefix + " You could take material possessions...",
+				prefix + " You could take whatever your heart desires!", 
+				prefix + " Try it! Just... steal something",
+				prefix + " You know you want to", 
+				prefix + " Fuck you" };
 		effects.add(new WheelConversationEffect(Duration.hours(1), stealing));
+
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(
-						"HEY!!! Time to get off this game Minecraft and play something even SHITTIER on steam for a bit! >:D");
+				spinner.sendMessage(prefix + " Go play a really shitty Steam game on Stream. Now.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage("Go buy yourself a fortune cookie from Carson");
+				spinner.sendMessage(prefix + " Go buy yourself a fortune cookie from Carson");
 			}
 		});
 
-		String[] twitchPrime = { "Have you heard of Twitch Prime?",
-				"Twitch Prime is a premium experience on Twitch that is included with Amazon Prime and Prime Video memberships",
-				"Twitch Prime includes bonus games, and exclusive in-game content, a channel subscription every month at no additional cost to be used on any Partner or Affiliate channels, exclusive emotes, and chat badges.",
-				"You can use your Amazon Prime account right now and subscribe to the channel you're watching!",
-				"Support Streamers! Use Twitch Prime!" };
+		String[] twitchPrime = { prefix + " Have you heard of Twitch Prime?", 
+				prefix + " Twitch Prime is a premium experience on Twitch that is included with Amazon Prime and Prime Video memberships",
+				prefix + " Twitch Prime includes bonus games, and exclusive in-game content, a channel subscription every month at no additional cost to be used on any Partner or Affiliate channels, exclusive emotes, and chat badges.",
+				prefix + " You can use your Amazon Prime account right now and subscribe to the channel you're watching!",
+				prefix + " Support Streamers! Use Twitch Prime!" };
 		effects.add(new WheelConversationEffect(Duration.minutes(2), twitchPrime));
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				sendTitle(spinner, "your mom");
+				sendTitle(spinner, "Your Mom.", "");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.getWorld().dropItem(spinner.getLocation(), new ItemStack(Material.DIAMOND, 2));
-				spinner.sendMessage("Go buy a burger or something");
+				spinner.sendMessage(prefix + " Go buy a burger or something");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				// TODO: teleport player to edge of one of the tallest buildings at spawn.
-				spinner.sendMessage("Welcome to the tallest building at spawn :D");
+				spinner.sendMessage(prefix + " Welcome to the tallest building at spawn!");
+				spinner.teleport(sky);
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage("Welcome to the Cuck Labyrinth");
-				// TODO: teleport player to Cuck Labyrinth
+				spinner.sendMessage(prefix + " Welcome to the Cuck Labyrinth");
+				spinner.teleport(cuck);
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(
-						"Let's have some fun... Go harass any streamer of your choosing for 30 minutes! No strings attached :3");
+				spinner.sendMessage(prefix + " Go harass somebody for 30 minutes. NOW.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage("Hehehe... go trap another streamer right now, with sand preferably");
+				spinner.sendMessage(prefix + " Go trap another streamer right now. NOW.");
 			}
 		});
 
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage("Go play Stal.");
+				spinner.getWorld().dropItem(spinner.getLocation(), new ItemStack(Material.MUSIC_DISC_STAL, 1));
+				spinner.sendMessage(prefix + " Go play Stal.");
 			}
 		});
 		effects.add(new WheelEffect() {
@@ -167,15 +188,17 @@ public class WheelEffectManager {
 				sendTitle(spinner, "HEY CHAT...", "Can you guys count to 100? Prove it...", 10, 20 * 2, 10);
 			}
 		});
-		
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\carson.jpg"));
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\ragek.jpg"));
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\mr-moseby.jpg"));
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\robertdowney.jpg"));
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\TrollFace.jpg"));
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\President_Barack_Obama.jpg"));
-		effects.add(WheelImageEffect.create("C:\\Users\\Paul\\Desktop\\Pictures\\Dwayne_Johnson_2,_2013.jpg"));
-		
+
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/carson.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/ragecomic.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/moseby.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/rdj.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/obama.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/therock.png"));
+
+		// REPLACE DIRECTORY WITH NEW IMAGES
+
 		System.out.println("Loaded " + effects.size() + " effects...");
 	}
 
@@ -186,21 +209,21 @@ public class WheelEffectManager {
 		int index = random.nextInt(effects.size());
 		return effects.get(index);
 	}
-	
+
 	public WheelEffect getEffect(String key) {
 		return effects.stream().filter(e -> {
-			if(e.getClass().isAnnotationPresent(GenerateEffect.class)) {
+			if (e.getClass().isAnnotationPresent(GenerateEffect.class)) {
 				return e.getClass().getAnnotation(GenerateEffect.class).key().equals(key);
 			}
-			
+
 			return false;
 		}).findAny().orElse(null);
 	}
-	
+
 	public WheelEffect getEffect(int index) {
-		if(index < 0 || index >= effects.size())
+		if (index < 0 || index >= effects.size())
 			return null;
-		
+
 		return effects.get(index);
 	}
 

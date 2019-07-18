@@ -14,7 +14,7 @@ public class SpeedEffect extends WheelEffect {
 	@Override
 	public void play(Player spinner, Wheel spun) {
 		spinner.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10 * 20, 50));
-		sendTitle(spinner, "You've been gifted Speed L");
+		sendTitle(spinner, "Gotta go FAST.", "");
 	}
 
 	

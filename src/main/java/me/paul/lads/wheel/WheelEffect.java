@@ -24,7 +24,7 @@ public abstract class WheelEffect {
 	 * @param player Player receiving the message
 	 * @param title Title message
 	 */
-	public void sendTitle(Player player, String title) {
+	public void sendTitle(Player player, String title, String subtitle) {
 		sendTitle(player, title, "", 10, 20, 10);
 	}
 	
