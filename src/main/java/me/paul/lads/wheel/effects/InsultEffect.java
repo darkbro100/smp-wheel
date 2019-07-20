@@ -2,11 +2,13 @@ package me.paul.lads.wheel.effects;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import me.paul.lads.wheel.GenerateEffect;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
+import net.md_5.bungee.api.ChatColor;
 
 @GenerateEffect(description = "Insults whoever spun this wheel", key = "effect_insult", name = "Insult Player")
 public class InsultEffect extends WheelEffect {
@@ -27,7 +29,8 @@ public class InsultEffect extends WheelEffect {
 	
 	@Override
 	public void play(Player spinner, Wheel spun) {
-		sendTitle(spinner, getMessage(), "");
+		sendTitle(spinner, getMessage(), "", 10, 20 * 6, 10);
+		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just got their feelings hurt.");
 	}
 
 	public String getMessage() {

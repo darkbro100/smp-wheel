@@ -20,6 +20,7 @@ import com.github.johnnyjayjay.spigotmaps.util.ImageTools;
 
 import me.paul.lads.Main;
 import me.paul.lads.util.SettingsManager;
+import net.md_5.bungee.api.ChatColor;
 
 public class WheelImageEffect extends WheelEffect {
 
@@ -34,6 +35,7 @@ public class WheelImageEffect extends WheelEffect {
 		ImageRenderer renderer = ImageRenderer.create(image);
 		RenderedMap map = MapBuilder.create().addRenderers(renderer).store(SettingsManager.getInstance()).world(spinner.getWorld()).build();
 		giveMap(map, spinner);
+		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received an image.");
 	}
 	
 	private void giveMap(RenderedMap map, Player p) {

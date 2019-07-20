@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import me.paul.lads.Main;
 import me.paul.lads.util.Duration;
+import net.md_5.bungee.api.ChatColor;
 
 public class WheelConversationEffect extends WheelEffect implements Runnable {
 
@@ -72,6 +73,7 @@ public class WheelConversationEffect extends WheelEffect implements Runnable {
 	public void play(Player spinner, Wheel spun) {
 		this.spinner = spinner;
 		this.conversationTask = Bukkit.getScheduler().runTaskTimer(Main.getInstance(), this, 1, 1);
+		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is being given some advice from the Wheel.");
 	}
 
 }

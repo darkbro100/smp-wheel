@@ -25,7 +25,7 @@ public abstract class WheelEffect {
 	 * @param title Title message
 	 */
 	public void sendTitle(Player player, String title, String subtitle) {
-		sendTitle(player, title, "", 10, 20, 10);
+		sendTitle(player, title, subtitle, 10, 20 * 10, 10);
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public abstract class WheelEffect {
 	 * @param fadeOut How long (in ticks) the title fades out for
 	 */
 	public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
-		player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+		player.sendTitle(title, subtitle, 10, 20 * 10, 10);
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public abstract class WheelEffect {
 	 */
 	public void broadcastTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
 		for(Player p : Bukkit.getOnlinePlayers())
-			sendTitle(p, title, subtitle, fadeIn, stay, fadeOut);
+			sendTitle(p, title, subtitle, 10, 20 * 10, 10);
 		Bukkit.getConsoleSender().sendMessage(title);
 		Bukkit.getConsoleSender().sendMessage(subtitle);
 	}

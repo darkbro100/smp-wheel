@@ -1,5 +1,6 @@
 package me.paul.lads.wheel.effects;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -16,6 +17,7 @@ public class GiveStalEffect extends WheelEffect {
 	public void play(Player spinner, Wheel spun) {
 		spinner.sendMessage(prefix + " Can I introduce you one of the HOTTEST tracks on the market today? Let me introduce to you to " + ChatColor.BLUE + "Stal");
 		spinner.getInventory().addItem(new ItemStack(Material.MUSIC_DISC_STAL));
+		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received Stal.");
 	}
 
 }

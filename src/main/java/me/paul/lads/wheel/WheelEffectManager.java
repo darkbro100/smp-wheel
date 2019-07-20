@@ -64,7 +64,7 @@ public class WheelEffectManager {
 
 		// world, x, y, z, yaw, pitch
 		World world = Bukkit.getWorld("SMPLive2");
-		Location sky = new Location(world, -107, 256, -34, -89, 50);
+		Location sky = new Location(world, -109, 256, -35, -89, 50);
 		Location cuck = new Location(world, -72, 68, -32, -179, 4);
 		String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
 				+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
@@ -77,27 +77,32 @@ public class WheelEffectManager {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix
 						+ " Don't you like the Annoying Orange? You should buy some merch dude. https://amzn.to/30pxb3D");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is looking at some new Merch.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Congratulations!");
+				Bukkit.broadcastMessage(ChatColor.GREEN + "Congratulations, " + spinner.getName());
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " You like Ninja dude? Go put on a VOD for the rest of the Stream. Now.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " likes Ninja so much that he's featured on stream.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Go on Twitter and post something really dumb. Now.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is making a new tweet.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix
 						+ " OPEN ENDED HIT. Kill anyone you desire on the server. Cannot be held against you in the court of law.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is armed and dangerous.");
 			}
 		});
 		String[] insuranceFraud = { prefix + " Ever heard of insurance fraud?",
@@ -130,11 +135,13 @@ public class WheelEffectManager {
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Go play a really shitty Steam game on Stream. Now.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is playing a new game on Steam.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Go buy yourself a fortune cookie from Carson");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " got some advice from the Wheel.");
 			}
 		});
 
@@ -147,33 +154,39 @@ public class WheelEffectManager {
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				sendTitle(spinner, "Your Mom.", "");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just got owned.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Go buy a burger or something");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " got some advice from the Wheel.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Welcome to the tallest building at spawn!");
 				spinner.teleport(sky);
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is getting some fresh air.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Welcome to the Cuck Labyrinth");
 				spinner.teleport(cuck);
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is dazed & confused.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Go harass somebody for 30 minutes. NOW.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received a DEMAND from the Wheel.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Go trap another streamer right now. NOW.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received a DEMAND from the Wheel.");
 			}
 		});
 
@@ -181,11 +194,13 @@ public class WheelEffectManager {
 			public void play(Player spinner, Wheel spun) {
 				spinner.getWorld().dropItem(spinner.getLocation(), new ItemStack(Material.MUSIC_DISC_STAL, 1));
 				spinner.sendMessage(prefix + " Go play Stal.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " was given Stal.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				sendTitle(spinner, "HEY CHAT...", "Can you guys count to 100? Prove it...", 10, 20 * 2, 10);
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just had their chat ruined.");
 			}
 		});
 

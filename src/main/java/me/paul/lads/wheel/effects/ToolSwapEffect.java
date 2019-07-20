@@ -3,6 +3,7 @@ package me.paul.lads.wheel.effects;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +45,8 @@ public class ToolSwapEffect extends WheelEffect {
 			}
 		}
 
-		sendTitle(spinner, "Your tools", "are now stone.");
+		sendTitle(spinner, "Your tools", "are now stone.", 10, 20 * 5, 10);
+		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just had their tools ruined.");
 	}
 
 }
