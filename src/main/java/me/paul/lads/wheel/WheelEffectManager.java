@@ -5,13 +5,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.SplittableRandom;
 
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+import org.bukkit.util.Vector;
 import org.reflections.Reflections;
 
 import lombok.Getter;
@@ -22,6 +25,7 @@ public class WheelEffectManager {
 
 	private List<WheelEffect> effects;
 	private SplittableRandom random;
+	private int troll;
 
 	private WheelEffectManager() {
 		this.effects = new ArrayList<WheelEffect>();
@@ -66,18 +70,13 @@ public class WheelEffectManager {
 		World world = Bukkit.getWorld("SMPLive2");
 		Location sky = new Location(world, -109, 256, -35, -89, 50);
 		Location cuck = new Location(world, -72, 68, -32, -179, 4);
+		Location ocean = new Location(world, 9979, 61, 4508);
+		Location corner = new Location(world, -19992, 70, 19993);
 		String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
 				+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				broadcastTitle(spinner.getName() + " is gay");
-			}
-		});
-		effects.add(new WheelEffect() {
-			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix
-						+ " Don't you like the Annoying Orange? You should buy some merch dude. https://amzn.to/30pxb3D");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is looking at some new Merch.");
 			}
 		});
 		effects.add(new WheelEffect() {
@@ -88,14 +87,15 @@ public class WheelEffectManager {
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " You like Ninja dude? Go put on a VOD for the rest of the Stream. Now.");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " likes Ninja so much that he's featured on stream.");
+				spinner.teleport(ocean);
+				spinner.sendMessage(prefix + " hope you're a good swimmer!!");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is lost at sea");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " Go on Twitter and post something really dumb. Now.");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is making a new tweet.");
+				spinner.sendMessage(prefix + " Listen to this really good song please. https://youtu.be/astISOttCQ0");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is listening to some music");
 			}
 		});
 		effects.add(new WheelEffect() {
@@ -105,62 +105,63 @@ public class WheelEffectManager {
 				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is armed and dangerous.");
 			}
 		});
-		String[] insuranceFraud = { prefix + " Ever heard of insurance fraud?",
-				prefix + " You know it's actually pretty hard to get caught for insurance fraud?",
-				prefix + " All you have to do is sign up for multiple insurance companies",
-				prefix + " And then you claim to have been stolen from",
-				prefix + " Listen, it's easy money. Easy profit", 
-				prefix + " You'll come around. I know you will",
-				prefix + " Insurance fraud has existed since the beginning of insurance as a commercial enterprise",
-				prefix + " So many people get away with it", 
-				prefix + " Insurance fraud",
-				prefix + " Weigh the positives and negatives and get back to me.",
-				prefix + " Have you come to a decision about... ahem... our business?", 
-				prefix + " Fuck you" };
-		effects.add(new WheelConversationEffect(Duration.hours(1), insuranceFraud));
-
-		String[] stealing = { prefix + " Ever wanted to have something that requires you to take it from someone else?",
-				prefix + " You should try stealing some time",
-				prefix + " You can take whatever you want and then it's yours!",
-				prefix + " There's no strings attached",
-				prefix + " Just take anything! You can have it! Nothing says you can't!",
-				prefix + " You could take money...", 
-				prefix + " You could take material possessions...",
-				prefix + " You could take whatever your heart desires!", 
-				prefix + " Try it! Just... steal something",
-				prefix + " You know you want to", 
-				prefix + " Fuck you" };
-		effects.add(new WheelConversationEffect(Duration.hours(1), stealing));
+		String[] carsonsJoke = { prefix + " You want to hear a funny joke?",
+				prefix + " So I'm sitting in the back of my car right?",
+				prefix + " Then I look up at this sign, you know", prefix + " The sign says 'Wood Fired Pizza'",
+				prefix + " So then I go, “Wood fired Pizza?, how’s Pizza gonna get a job now??”",
+				prefix + " haha You get it right? It’s really funny",
+				prefix + " Get it because it’s like someone named “Wood” fired somebody named “Pizza”",
+				prefix + " But it actually just describes how the pizza was cooked", prefix + " Fuck you" };
+		effects.add(new WheelConversationEffect(Duration.minutes(15), carsonsJoke));
 
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " Go play a really shitty Steam game on Stream. Now.");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is playing a new game on Steam.");
+				spinner.teleport(corner);
+				spinner.sendMessage(prefix + " FIND A WAY BACK.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " has to find their way back.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " Go buy yourself a fortune cookie from Carson");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " got some advice from the Wheel.");
+				spinner.sendMessage(prefix + " You must challenge a fellow streamer to either of the following:");
+				spinner.sendMessage(ChatColor.AQUA + "Checkers");
+				spinner.sendMessage(ChatColor.AQUA + "Connect Four");
+				spinner.sendMessage(ChatColor.AQUA + "Battleship");
+				spinner.sendMessage(ChatColor.AQUA + "Chess");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " has a challenge to make.");
 			}
 		});
 
-		String[] twitchPrime = { prefix + " Have you heard of Twitch Prime?", 
-				prefix + " Twitch Prime is a premium experience on Twitch that is included with Amazon Prime and Prime Video memberships",
+		String[] twitchPrime = { prefix + " Have you heard of Twitch Prime?", prefix
+				+ " Twitch Prime is a premium experience on Twitch that is included with Amazon Prime and Prime Video memberships",
 				prefix + " Twitch Prime includes bonus games, and exclusive in-game content, a channel subscription every month at no additional cost to be used on any Partner or Affiliate channels, exclusive emotes, and chat badges.",
 				prefix + " You can use your Amazon Prime account right now and subscribe to the channel you're watching!",
 				prefix + " Support Streamers! Use Twitch Prime!" };
 		effects.add(new WheelConversationEffect(Duration.minutes(2), twitchPrime));
+
+		String[] herobrine = { ChatColor.YELLOW + "herobrine joined the game",
+				"<herobrine> sup fuckers",
+				"<herobrine> how funny would it be if i destroyed spawn",
+				"<herobrine> or how about this, your nether link? haha imagine",
+				ChatColor.YELLOW + "herobrine left the game",
+				ChatColor.YELLOW + "Detected Minecraft update -- (rev1.14.5, - Removed Herobrine)"
+	};
+		effects.add(new WheelPublicEffect(Duration.minutes(3), herobrine));
+		
+		String[] notch = { ChatColor.YELLOW + "Notch joined the game",
+				"<Notch> wow this server fucking sucks lol",
+				"<Notch> you guys actually stream this?",
+				"<Notch> this is most disappointed i’ve ever been in a minecraft community",
+				"<Notch> lemme just say I get so many bitches and hoes, it’s unreal",
+				"<Notch> alright later losers",
+				ChatColor.YELLOW + "Notch left the game",
+	};
+		effects.add(new WheelPublicEffect(Duration.minutes(5), notch));
+
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				sendTitle(spinner, "Your Mom.", "");
 				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just got owned.");
-			}
-		});
-		effects.add(new WheelEffect() {
-			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " Go buy a burger or something");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " got some advice from the Wheel.");
 			}
 		});
 		effects.add(new WheelEffect() {
@@ -179,14 +180,19 @@ public class WheelEffectManager {
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " Go harass somebody for 30 minutes. NOW.");
+				spinner.sendMessage(prefix + " Listen to this hot soundtrack for the rest of the Stream.");
+				spinner.sendMessage(
+						ChatColor.GREEN + "https://www.youtube.com/playlist?list=PLggwlnlDbhNxbrlmutHDn8v3CWu2bKB8J");
 				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received a DEMAND from the Wheel.");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + " Go trap another streamer right now. NOW.");
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received a DEMAND from the Wheel.");
+				spinner.sendMessage(prefix + " BURN. BURN. BURN. BURN");
+				Location strike = spinner.getLocation();
+				spinner.getWorld().strikeLightning(strike);
+				spinner.setFireTicks(400);
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " was burned by the Wheel.");
 			}
 		});
 
@@ -203,14 +209,34 @@ public class WheelEffectManager {
 				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just had their chat ruined.");
 			}
 		});
+		effects.add(new WheelEffect() {
+			public void play(Player spinner, Wheel spun) {
+				spinner.sendMessage(prefix + "Dude have you ever seen Charlie & the Chocolate Factory? You remember that one scene?");
+				spinner.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 1200, 7));
+				spinner.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 1200, 15));
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + "drank some Fizzy Lifting Soda");
+			}
+		});
+		effects.add(new WheelEffect() {
+			public void play(Player spinner, Wheel spun) {
+				spinner.sendMessage(prefix + "Dirty.");
+				spinner.getInventory().addItem(new ItemStack(Material.DIRT, 2304));
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + "is dirty.");
+			}
+		});
 
 		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/carson.png"));
 		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/ragecomic.png"));
 		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/moseby.png"));
 		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/rdj.png"));
+		this.troll = effects.size();
 		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
 		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/obama.png"));
-		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/therock.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
+		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
 
 		// REPLACE DIRECTORY WITH NEW IMAGES
 
@@ -223,6 +249,10 @@ public class WheelEffectManager {
 	public WheelEffect getRandomEffect() {
 		int index = random.nextInt(effects.size());
 		return effects.get(index);
+	}
+
+	public WheelEffect getTrollEffect() {
+		return getEffect(troll);
 	}
 
 	public WheelEffect getEffect(String key) {

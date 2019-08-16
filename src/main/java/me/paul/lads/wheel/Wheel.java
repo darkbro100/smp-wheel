@@ -140,7 +140,7 @@ public class Wheel implements Runnable {
 		pitchInc = 1.5F / executionProjection;
 		lastSpinner = opener.getUniqueId();
 		Runnable onDone = () -> Bukkit.broadcastMessage(ChatColor.GREEN + "The Wacky Wheel has been granted another life...");
-		lastSpin = DEBUG ? new Cooldown(Duration.minutes(1)).onDone(onDone) : new Cooldown(Duration.minutes(10)).onDone(onDone);
+		lastSpin = DEBUG ? new Cooldown(Duration.minutes(1)).onDone(onDone) : new Cooldown(Duration.minutes(2)).onDone(onDone);
 		
 		this.wheelTask = Bukkit.getScheduler().runTaskTimer(Main.getInstance(), this, updateFrequency, updateFrequency);
 		return true;
@@ -247,7 +247,7 @@ public class Wheel implements Runnable {
 				return;
 			}
 
-			Bukkit.broadcastMessage(ChatColor.RED + "The Wacky Wheel has decided it's fate!");
+			Bukkit.broadcastMessage(ChatColor.RED + "The Wacky Wheel has decided its fate!");
 			lastAngle = offset;
 			resetRunnable();
 			

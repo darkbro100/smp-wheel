@@ -37,8 +37,13 @@ public class WheelImageEffect extends WheelEffect {
 		giveMap(map, spinner);
 		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " received an image.");
 	}
+	public void giveMap(Player p) {
+		ImageRenderer renderer = ImageRenderer.create(image);
+		RenderedMap map = MapBuilder.create().addRenderers(renderer).store(SettingsManager.getInstance()).world(p.getWorld()).build();
+		giveMap(map, p);
+	}
 	
-	private void giveMap(RenderedMap map, Player p) {
+	public void giveMap(RenderedMap map, Player p) {
 		MapView view = Bukkit.createMap(map.getWorld());
 		view.getRenderers().forEach(view::removeRenderer);
 		map.getRenderers().forEach(view::addRenderer);

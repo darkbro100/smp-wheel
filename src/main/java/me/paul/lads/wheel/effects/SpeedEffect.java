@@ -15,7 +15,7 @@ public class SpeedEffect extends WheelEffect {
 
 	@Override
 	public void play(Player spinner, Wheel spun) {
-		spinner.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10 * 20, 50));
+		spinner.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60 * 20, 50));
 		sendTitle(spinner, "Gotta go FAST.", "");
 		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is fast as fuck BOYY");
 	}

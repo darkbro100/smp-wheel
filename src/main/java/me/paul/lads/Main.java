@@ -4,9 +4,13 @@ import java.util.List;
 
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.map.MapRenderer;
@@ -87,5 +91,19 @@ public class Main extends JavaPlugin implements Listener {
 			renders.forEach(view::addRenderer);
 		}	
 	}
+		
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent e) {
+		EntityDamageEvent cause = e.getEntity().getLastDamageCause();
+		if(cause != null && cause.getCause() == DamageCause.VOID) { 
+			e.setDeathMessage(ChatColor.BLUE + e.getEntity().getName() + " has sacrificed their body to the V O I D");
+			Location location = e.getEntity().getLocation();
+			e.getEntity().getWorld().strikeLightning(location);
+			e.getEntity().getWorld().strikeLightning(location);
+			e.getEntity().getWorld().strikeLightning(location);
+		}
 	
+	}
 }
+	
+
