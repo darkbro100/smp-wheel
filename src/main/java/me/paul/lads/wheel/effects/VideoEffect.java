@@ -12,8 +12,8 @@ import net.md_5.bungee.api.ChatColor;
 
 @GenerateEffect(description = "Tells whoever spun the wheel to play a video", key = "effect_video", name = "Play Video")
 public class VideoEffect extends WheelEffect {
-	static String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[Wheel of" + ChatColor.RED + ChatColor.ITALIC
-			+ " FEAR" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
+	static String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
+			+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 
 	private static final String[] messages = { 
 			prefix + " Watch this on stream: https://www.youtube.com/watch?v=MF7ql39_ufY",

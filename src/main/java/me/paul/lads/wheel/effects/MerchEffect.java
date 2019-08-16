@@ -12,8 +12,8 @@ import net.md_5.bungee.api.ChatColor;
 
 @GenerateEffect(description = "Tells whoever spun the wheel to buy some merch", key = "effect_merch", name = "Buy Merch")
 public class MerchEffect extends WheelEffect {
-	static String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[Wheel of" + ChatColor.RED + ChatColor.ITALIC
-			+ " FEAR" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
+	static String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
+			+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 
 	private static final String[] messages = { 
 			prefix + " How about some annoying orange? https://amzn.to/30pxb3D",

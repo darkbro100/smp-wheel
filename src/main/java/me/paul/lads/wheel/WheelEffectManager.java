@@ -211,17 +211,17 @@ public class WheelEffectManager {
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + "Dude have you ever seen Charlie & the Chocolate Factory? You remember that one scene?");
-				spinner.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 1200, 7));
-				spinner.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 1200, 15));
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + "drank some Fizzy Lifting Soda");
+				spinner.sendMessage(prefix + " Dude have you ever seen Charlie & the Chocolate Factory? You remember that one scene?");
+				spinner.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 1200, 4));
+				spinner.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 1200, 2));
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " drank some Fizzy Lifting Soda");
 			}
 		});
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
-				spinner.sendMessage(prefix + "Dirty.");
+				spinner.sendMessage(prefix + " Dirty.");
 				spinner.getInventory().addItem(new ItemStack(Material.DIRT, 2304));
-				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + "is dirty.");
+				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " is dirty.");
 			}
 		});
 

@@ -17,8 +17,8 @@ import net.md_5.bungee.api.ChatColor;
 
 @GenerateEffect(description = "Creates a Hunt on the player", key = "effect_manhunt", name = "Manhunt")
 public class HuntEffect extends WheelEffect implements Listener {
-	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[Wheel of" + ChatColor.RED + ChatColor.ITALIC
-			+ " FEAR" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
+	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
+			+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 	private String spinner;
 	@Override
 	public void play(Player spinner, Wheel spun) {
@@ -32,8 +32,10 @@ public class HuntEffect extends WheelEffect implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		if(e.getEntity().getName().equalsIgnoreCase(spinner)){
 			Player killer = e.getEntity().getKiller();
+			if(killer != null && killer instanceof Player) {
 			((WheelImageEffect)WheelEffectManager.getInstance().getTrollEffect()).giveMap(killer);
 			HandlerList.unregisterAll(this);	
+			}
 		}
 	}
 }
