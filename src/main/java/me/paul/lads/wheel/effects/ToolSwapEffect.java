@@ -18,7 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 public class ToolSwapEffect extends WheelEffect {
 
 	private List<String> tools = Arrays.asList("pickaxe", "hoe", "axe", "shovel", "sword");
-	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[Wheel of" + ChatColor.RED + ChatColor.ITALIC + " FEAR" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
+	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC + " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 	
 	@Override
 	public void play(Player spinner, Wheel spun) {

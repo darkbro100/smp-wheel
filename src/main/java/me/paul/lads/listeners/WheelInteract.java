@@ -40,7 +40,6 @@ public class WheelInteract implements Listener {
 					event.getPlayer().sendMessage(ChatColor.RED + "Wheel is already being spun!");
 					return;
 				} else {
-					p.sendMessage(ChatColor.GREEN + "Wheel has been successfully spun!");
 //					user.setSpins(user.getSpins() - 1);
 //					if(user.getSpins() < 0)
 //						user.setSpins(0);

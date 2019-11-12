@@ -29,7 +29,7 @@ import me.paul.lads.Main;
 import me.paul.lads.util.Cooldown;
 import me.paul.lads.util.Duration;
 import me.paul.lads.util.LocUtil;
-import me.paul.lads.wheel.effects.KeepGoingEffect;
+// import me.paul.lads.wheel.effects.KeepGoingEffect;
 
 @Getter
 public class Wheel implements Runnable {
@@ -139,7 +139,7 @@ public class Wheel implements Runnable {
 		 */
 		pitchInc = 1.5F / executionProjection;
 		lastSpinner = opener.getUniqueId();
-		Runnable onDone = () -> Bukkit.broadcastMessage(ChatColor.GREEN + "The Wacky Wheel has been granted another life...");
+		Runnable onDone = () -> Bukkit.broadcastMessage(ChatColor.GREEN + "The Wacky Wheel is ready to spin.");
 		lastSpin = DEBUG ? new Cooldown(Duration.minutes(1)).onDone(onDone) : new Cooldown(Duration.minutes(2)).onDone(onDone);
 		
 		this.wheelTask = Bukkit.getScheduler().runTaskTimer(Main.getInstance(), this, updateFrequency, updateFrequency);
@@ -239,15 +239,14 @@ public class Wheel implements Runnable {
 	public void run() {
 		if (execWait == 0) {
 			WheelEffect effect = WheelEffectManager.getInstance().getRandomEffect();
-			if(shouldReverse || effect instanceof KeepGoingEffect) {
-				execWait++;
-				reverse = true;
-				shouldReverse = true;
-				shouldPlay = false;
-				return;
-			}
+	//		if(shouldReverse || effect instanceof KeepGoingEffect) {
+	//			execWait++;
+	//			reverse = true;
+	//			shouldReverse = true;
+	//			shouldPlay = false;
+		//		return;
+		//	}
 
-			Bukkit.broadcastMessage(ChatColor.RED + "The Wacky Wheel has decided its fate!");
 			lastAngle = offset;
 			resetRunnable();
 			

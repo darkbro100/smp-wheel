@@ -68,7 +68,7 @@ public class FlyingWheelEffect extends WheelEffect {
 			    public void run() {
 			    	blocks.forEach(b -> {
 			    		// change speed of the flying effect
-			    		b.setVelocity(new Vector(xVel, 0.8,zVel));
+			    		b.setVelocity(new Vector(xVel, 0.6,zVel));
 			    	});
 			    	
 			    	if (counter++ > 20 * 10)
