@@ -2,24 +2,14 @@ package me.paul.lads;
 
 import java.util.List;
 
-
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
-
-import com.github.johnnyjayjay.spigotmaps.InitializationListener;
 
 import lombok.Getter;
 import me.paul.lads.cmd.DonationCommand;
@@ -30,15 +20,11 @@ import me.paul.lads.listeners.WheelInteract;
 import me.paul.lads.streamlabs.LabUtil;
 import me.paul.lads.util.SettingsManager;
 import me.paul.lads.wheel.WheelEffectManager;
-import net.md_5.bungee.api.ChatColor;
 
 @Getter
 public class Main extends JavaPlugin implements Listener {
 	
 
-	public static void main(String[] args) {
-	}
-	
 	@Getter
 	private static Main instance = null;
 	

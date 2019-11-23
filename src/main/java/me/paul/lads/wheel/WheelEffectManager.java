@@ -7,20 +7,16 @@ import java.util.SplittableRandom;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.EnderDragon.Phase;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-import org.bukkit.util.Vector;
 import org.reflections.Reflections;
 
 import lombok.Getter;
-import me.paul.lads.util.Duration;
 import net.md_5.bungee.api.ChatColor;
 
 public class WheelEffectManager {
@@ -147,9 +143,10 @@ public class WheelEffectManager {
 			public void play(Player spinner, Wheel spun) {
 				spinner.sendMessage(prefix + " Surprise fucker.");
 				Location loc = spinner.getLocation();
-				spinner.getWorld().spawn(loc, EnderDragon.class);
-				spinner.getWorld().spawn(loc, EnderDragon.class);
-				spinner.getWorld().spawn(loc, EnderDragon.class);
+				for(int i = 0; i < 3; i++) {
+					EnderDragon dragon = spinner.getWorld().spawn(loc, EnderDragon.class);
+					dragon.setPhase(Phase.CHARGE_PLAYER);
+				}
 				spinner.getWorld().strikeLightning(loc); 
 				Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just summoned some fucking dragons");
 			}
