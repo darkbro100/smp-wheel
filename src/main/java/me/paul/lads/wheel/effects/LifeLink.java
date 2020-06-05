@@ -11,10 +11,12 @@ import org.bukkit.plugin.Plugin;
 
 import me.paul.lads.Main;
 import me.paul.lads.util.scheduler.Sync;
+import me.paul.lads.wheel.GenerateEffect;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
 import net.md_5.bungee.api.ChatColor;
 
+@GenerateEffect(description = "Link everyone's lives", key = "effect_lifelink", name = "LifeLink")
 public class LifeLink extends WheelEffect implements Listener {
 	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 	private String spinner;

@@ -8,9 +8,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 
 import me.paul.lads.util.scheduler.Sync;
+import me.paul.lads.wheel.GenerateEffect;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
 
+@GenerateEffect(description = "Explodes everyones beds", key = "effect_bed", name = "Explode Beds")
 public class BedExplodeEffect extends WheelEffect {
 	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me: ";
 
