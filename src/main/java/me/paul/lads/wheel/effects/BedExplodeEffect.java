@@ -31,7 +31,7 @@ public class BedExplodeEffect extends WheelEffect {
 		List<Location> locations = new ArrayList<>();
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			try {
-				Location bedLoc = player.getBedLocation();
+				Location bedLoc = player.getBedSpawnLocation();
 				if (bedLoc == null) {
 					continue;
 				} else {
