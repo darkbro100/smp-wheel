@@ -10,6 +10,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 import me.paul.lads.Main;
+import me.paul.lads.util.scheduler.Sync;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
 import net.md_5.bungee.api.ChatColor;
@@ -20,8 +21,13 @@ public class LifeLink extends WheelEffect implements Listener {
 
 	public void play(Player spinner, Wheel spun) {
 		this.spinner = spinner.getName();
-		spinner.sendMessage(String.valueOf(this.prefix) + " You life is now LINKED.");
-		Bukkit.broadcastMessage(ChatColor.GREEN + ChatColor.BOLD.toString() + "LIFE LINK! If one person dies, EVERYONE dies.");
+		spinner.sendMessage(String.valueOf(this.prefix) + " Your life is now LINKED.");
+		Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + "Your life is now LINKED", ChatColor.DARK_RED + "One person dies, everyone dies.", 10, 20*5, 10));
+		for (int i = 0; i < 7; i++) {
+			Sync.get().delay(i * 5).run(() -> {
+				Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 10f, 0f));
+			}); 
+		}
 		Bukkit.getPluginManager().registerEvents(this, (Plugin) Main.getInstance());
 	}
 	boolean looping = false;
