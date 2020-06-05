@@ -25,11 +25,11 @@ public class BedExplodeEffect extends WheelEffect {
 
 		Sync.get().cycles(5).delay(40).run(() -> {
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				Location bedLoc = null;
-				if (player.getBedLocation() == null) {
+				Location bedLoc = player.getBedLocation();
+				if (bedLoc == null) {
 					continue;
 				} else {
-					bedLoc = player.getBedLocation().clone().add(0, 5, 0);
+					bedLoc = bedLoc.clone().add(0, 5, 0);
 					bedLoc.getWorld().spawn(bedLoc, TNTPrimed.class);
 				}
 			}

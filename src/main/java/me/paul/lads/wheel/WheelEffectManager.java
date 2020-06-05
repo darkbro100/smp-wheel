@@ -74,7 +74,7 @@ public class WheelEffectManager {
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 40, 7));
+					p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 20*40, 7));
 					p.sendTitle(ChatColor.BLUE + "Up, up and away!!", "It's not flying, it's falling, with style.", 10, 20*4, 10);
 					p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1f);
 				}
