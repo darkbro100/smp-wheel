@@ -25,22 +25,14 @@ public class LocationSwapEffect extends WheelEffect {
 
 	@Override
 	public void play(Player spinner, Wheel spun) {
-//		List<Location> playerLoc = new ArrayList<>();
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			p.sendTitle(ChatColor.BLUE + ChatColor.BOLD.toString() + "Random Telport",
+			p.sendTitle(ChatColor.BLUE + ChatColor.BOLD.toString() + "Random Teleport",
 					"Trading places with another player!", 10, 20 * 5, 10);
 			p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
-//			Location loc = p.getLocation();
-//			playerLoc.add(loc);
 		}
 
 		Sync.get().delay(40).run(() -> {
 			Teleport();
-//			for (Player p : Bukkit.getOnlinePlayers()) {
-//				int locNumber = new Random().nextInt(playerLoc.size());
-//				Location newLoc = playerLoc.get(locNumber);
-//				p.teleport(newLoc);
-//			}
 		});
 
 	}

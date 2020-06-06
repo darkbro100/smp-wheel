@@ -6,13 +6,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import me.paul.lads.util.scheduler.Sync;
 import me.paul.lads.wheel.GenerateEffect;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
@@ -27,8 +27,8 @@ public class InventorySwapEffect extends WheelEffect {
 		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " swapped everyone's inventories!");
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			p.sendTitle(ChatColor.GOLD + ChatColor.BOLD.toString() + "Inventory Changing!",
-					"Trading inventories with another player!", 10, 20 * 5, 10);
-			p.playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+					"Trading inventories with another player!", 10, 20 * 3, 10);
+			p.playSound(p.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1f, 1f);
 			swap();
 		}
 	}
@@ -45,9 +45,11 @@ public class InventorySwapEffect extends WheelEffect {
 			Map.Entry<Player, ItemStack[]> entry = playerEntries.get(i);
 			int nextIndex = (i == playerEntries.size() - 1) ? 0 : (i + 1);
 			Map.Entry<Player, ItemStack[]> swapTo = playerEntries.get(nextIndex);
-			((Player) entry.getKey()).getInventory().setContents(swapTo.getValue());
-			((Player) entry.getKey()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
-					ChatColor.GREEN + ChatColor.BOLD.toString() + "You swapped inventories with: " + ChatColor.GOLD + ((Player) swapTo.getKey()).getName()));
+			Sync.get().delay(40).run(() -> {
+				((Player) entry.getKey()).getInventory().setContents(swapTo.getValue());
+				((Player) entry.getKey()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
+						ChatColor.GREEN + ChatColor.BOLD.toString() + "You swapped inventories with: " + ChatColor.GOLD + ((Player) swapTo.getKey()).getName()));
+			});
 		}
 	}
 }
