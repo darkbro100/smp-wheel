@@ -2,12 +2,11 @@ package me.paul.lads.wheel.effects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
-
-import me.paul.lads.util.scheduler.Sync;
+import org.bukkit.inventory.ItemStack;
 import me.paul.lads.wheel.GenerateEffect;
 import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
@@ -25,14 +24,11 @@ public class ZombieInvasion extends WheelEffect {
 		
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			Location loc = p.getLocation().clone().add(0, 0, 5);
-			Sync.get().cycles(25).delay(20).run(() -> {
+			for (int i = 0; i < 25; i++) {
 				Zombie z = loc.getWorld().spawn(loc, Zombie.class);
 				z.setBaby(false);
-				z.setHealth(40);
-				z.setTarget((LivingEntity) z.getNearbyEntities(50, 0, 50));
-			});
+				z.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+			}
 		}
-		
 	}
-
 }
