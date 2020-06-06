@@ -44,7 +44,7 @@ public class MeteorEffect extends WheelEffect {
 	            final Location spawnLoc = p.getLocation().clone().add(xOff, yOff, zOff);
 	            final Location playerLoc = p.getLocation();
 
-	            Sync.get().delay(2000 + (2000 * i)).run(() -> {
+	            Sync.get().delay(60*10 + (1500 * i)).run(() -> {
 	                Meteor m = new Meteor(RADIUS);
 	                m.spawn(spawnLoc);
 	                m.strike(playerLoc);
