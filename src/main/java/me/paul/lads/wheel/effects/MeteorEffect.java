@@ -29,7 +29,7 @@ public class MeteorEffect extends WheelEffect {
 		// Announce meteors incoming
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.sendTitle(ChatColor.DARK_RED + ChatColor.BOLD.toString() + "INCOMING METEORS",
-					"10 SECONDS TO IMPACT", 10, 20 * 5, 10);
+					"GET TO COVER!!!!", 10, 20 * 5, 10);
 			for (int i = 0; i < 7; i++) {
 				Sync.get().delay(i * 5).run(() -> {
 					Bukkit.getOnlinePlayers()
