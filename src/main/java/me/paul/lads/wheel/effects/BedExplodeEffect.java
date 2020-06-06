@@ -33,8 +33,8 @@ public class BedExplodeEffect extends WheelEffect {
 			try {
 				Location bedLoc = player.getBedSpawnLocation();
 				if (bedLoc == null) {
-					player.teleport(player.getLocation().clone().add(0, 25, 0));
-					player.sendMessage(prefix + "Oh you think you're safe because you don't have a bed? Wrong.");
+					player.teleport(player.getLocation().clone().add(0, 50, 0));
+					player.sendMessage(prefix + "Oh you think you're safe because you don't have a bed? Wrong. Up you go!");
 					continue;
 				} else {
 					locations.add(bedLoc);
