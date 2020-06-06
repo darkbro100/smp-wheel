@@ -13,14 +13,14 @@ import me.paul.lads.wheel.Wheel;
 import me.paul.lads.wheel.WheelEffect;
 import net.md_5.bungee.api.ChatColor;
 
-@GenerateEffect(description = "Zombie Apocolypse", key = "effect_zombie", name = "Zombie Apocolypse")
+@GenerateEffect(description = "Zombie Apocalypse", key = "effect_zombie", name = "Zombie Apocalypse")
 public class ZombieInvasion extends WheelEffect {
 	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[Wheel of" + ChatColor.RED + ChatColor.ITALIC
 			+ " FEAR" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 
 	@Override
 	public void play(Player spinner, Wheel spun) {
-		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " has started the Zombie Apocolypse! Run!!");
+		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " has started the Zombie Apocalypse! Run!!");
 		Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, 1f, 1f));
 		
 		for (Player p : Bukkit.getOnlinePlayers()) {
