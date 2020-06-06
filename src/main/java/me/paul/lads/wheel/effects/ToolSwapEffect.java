@@ -47,7 +47,7 @@ public class ToolSwapEffect extends WheelEffect {
 		}
 
 		spinner.playSound(spinner.getLocation(), Sound.ENTITY_ITEM_BREAK, 1f, 1f);
-		sendTitle(spinner, ChatColor.DARK_RED + "Your tools are now", ChatColor.DARK_GRAY + " STONE.", 10, 20 * 5, 10);
+		sendTitle(spinner, ChatColor.DARK_RED + "Your tools are now", ChatColor.GRAY + " STONE.", 10, 20 * 5, 10);
 		Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just had their tools ruined.");
 	}
 
