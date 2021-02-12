@@ -24,13 +24,6 @@ public class WheelInteract implements Listener {
 					return;
 				}
 				
-//				LabUser user = LabUtil.getInstance().getUser(event.getPlayer().getUniqueId());
-//				
-//				if(user == null) {
-//					event.getPlayer().sendMessage(ChatColor.RED + "You're not a registered streamer on the server! Contact an admin if this is an issue!");
-//					return;
-//				}
-				
 				boolean res = w.spin(p);
 				
 				if(!res && w.isLocked()) {
@@ -40,9 +33,7 @@ public class WheelInteract implements Listener {
 					event.getPlayer().sendMessage(ChatColor.RED + "Wheel is already being spun!");
 					return;
 				} else {
-//					user.setSpins(user.getSpins() - 1);
-//					if(user.getSpins() < 0)
-//						user.setSpins(0);
+
 				}
 			}
 		}

@@ -18,7 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 
 @GenerateEffect(description = "Strikes a meteor on the player", key = "wheel_meteor", name = "Meteor")
 public class MeteorEffect extends WheelEffect {
-	private static final int RADIUS = 2;
+	private static final int RADIUS = 3;
 
 	@Override
 	public void play(Player spinner, Wheel spun) {
@@ -44,7 +44,7 @@ public class MeteorEffect extends WheelEffect {
 	            final Location spawnLoc = p.getLocation().clone().add(xOff, yOff, zOff);
 	            final Location playerLoc = p.getLocation();
 
-	            Sync.get().delay(60*10 + (1500 * i)).run(() -> {
+	            Sync.get().delay(5 + (5 * i)).run(() -> {
 	                Meteor m = new Meteor(RADIUS);
 	                m.spawn(spawnLoc);
 	                m.strike(playerLoc);

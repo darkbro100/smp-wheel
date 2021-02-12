@@ -106,9 +106,6 @@ public class Wheel implements Runnable {
 		wheels.add(this);
 	}
 	
-//	public boolean isLocked(LabUser opener) {
-//		return opener.getSpins() <= 0;
-//	}
 
 	public boolean isLocked() {
 		return lastSpin != null && !lastSpin.hasExpired();

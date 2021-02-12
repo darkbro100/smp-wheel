@@ -2,11 +2,16 @@ package me.paul.lads.wheel.effects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
 import me.paul.lads.Main;
@@ -28,6 +33,33 @@ public class Manhunt extends WheelEffect implements Listener {
 				+ spinner.getName() + ChatColor.GREEN + ChatColor.BOLD + " gets 10 DIAMONDS!!!");
 		Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
 	}
+	
+	@EventHandler
+	public void onPlayerDamage(EntityDamageByEntityEvent e) {
+		if (e.getDamager() instanceof Player) {
+			Player p = (Player) e.getEntity();
+			if (!p.isOp()) {
+				e.setDamage(1);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onProjectileDamage(EntityDamageByEntityEvent e) {
+		if (e.getDamager() instanceof Projectile) {
+		 Projectile p = (Projectile) e.getEntity();
+		 if (p.getShooter() instanceof Player) {
+			 Player a = (Player) p.getShooter();
+			 if (!a.isOp()) {
+				 e.setDamage(1);
+			 }
+		 }
+		}
+	}
+	
+	
+	
+	
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		if(e.getEntity().getName().equalsIgnoreCase(spinner)){

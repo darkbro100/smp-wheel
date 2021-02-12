@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -22,8 +21,6 @@ import com.github.johnnyjayjay.spigotmaps.rendering.ImageRenderer;
 import com.google.common.collect.Lists;
 
 import me.paul.lads.Main;
-import me.paul.lads.streamlabs.LabUser;
-import me.paul.lads.streamlabs.LabUtil;
 import me.paul.lads.wheel.Wheel;
 
 public class SettingsManager implements MapStorage {
@@ -35,8 +32,6 @@ public class SettingsManager implements MapStorage {
 
 	private File wheelFile;
 	private YamlConfiguration wheelConfig;
-
-	private File userFolder;
 
 	public static SettingsManager getInstance() {
 		return instance;
@@ -58,68 +53,6 @@ public class SettingsManager implements MapStorage {
 
 		wheelConfig = YamlConfiguration.loadConfiguration(wheelFile);
 
-		loadLabUsers();
-	}
-
-	private void loadLabUsers() {
-		userFolder = new File(Main.getInstance().getDataFolder(), "users");
-		if (!userFolder.exists())
-			userFolder.mkdir();
-
-		for (File f : userFolder.listFiles()) {
-			try {
-				String uuidStr = f.getName().replaceAll(".yml", "");
-				UUID uuid = UUID.fromString(uuidStr);
-
-				YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(f);
-				String twitch = playerConfig.getString("twitch");
-				String userName = playerConfig.getString("lastUserName");
-				double wheelUnlock = playerConfig.getDouble("wheelUnlock");
-				double moneyReceived = playerConfig.getDouble("moneyReceived");
-				String accessToken = playerConfig.getString("accessToken");
-				int spins = playerConfig.getInt("spins-available");
-
-				LabUser user = new LabUser(userName, uuid, twitch, accessToken);
-				user.setWheelGoal(wheelUnlock);
-				user.setMoneyReceived(moneyReceived);
-				user.setSpins(spins);
-
-				LabUtil.getInstance().getStreamers().add(user);
-				System.out.println("Loaded streamer: " + user.getTwitchUser() + " " + user.getMcUser());
-			} catch (Exception e) {
-				System.err.println("Error trying to read user file: " + f.getAbsolutePath());
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveLabUsers() {
-		for (LabUser user : LabUtil.getInstance().getStreamers()) {
-			File userFile = new File(userFolder, user.getMcUuid().toString() + ".yml");
-			if (!userFile.exists()) {
-				try {
-					userFile.createNewFile();
-				} catch (Exception e) {
-					System.err.println("Error creating file for streamer: " + user.getMcUser());
-					e.printStackTrace();
-				}
-			}
-
-			YamlConfiguration userConfig = YamlConfiguration.loadConfiguration(userFile);
-			userConfig.set("twitch", user.getTwitchUser());
-			userConfig.set("lastUserName", user.getMcUser());
-			userConfig.set("accessToken", user.getAccessToken());
-			userConfig.set("wheelUnlock", user.getWheelGoal());
-			userConfig.set("moneyReceived", user.getMoneyReceived());
-			userConfig.set("spins-available", user.getSpins());
-
-			try {
-				userConfig.save(userFile);
-			} catch (IOException e) {
-				System.err.println("Error writing to user file: " + userFile.getAbsolutePath());
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public YamlConfiguration getWheelConfig() {

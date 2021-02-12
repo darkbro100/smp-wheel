@@ -12,12 +12,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import lombok.Getter;
-import me.paul.lads.cmd.DonationCommand;
-import me.paul.lads.cmd.LinkTwitchCommand;
 import me.paul.lads.cmd.WheelCommand;
 import me.paul.lads.cmd.WheelEffectCommand;
 import me.paul.lads.listeners.WheelInteract;
-import me.paul.lads.streamlabs.LabUtil;
 import me.paul.lads.util.SettingsManager;
 import me.paul.lads.wheel.WheelEffectManager;
 
@@ -40,11 +37,8 @@ public class Main extends JavaPlugin implements Listener {
 		SettingsManager.getInstance().setup();
 		SettingsManager.getInstance().loadWheels();
 		SettingsManager.getInstance().loadMapRenders();
-		LabUtil.getInstance();
 		
 		getCommand("wheel").setExecutor(new WheelCommand());
-		getCommand("donation").setExecutor(new DonationCommand());
-		getCommand("linktwitch").setExecutor(new LinkTwitchCommand());
 		getCommand("wheeleffect").setExecutor(new WheelEffectCommand());
 		
 		registerListeners();
@@ -56,7 +50,6 @@ public class Main extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		SettingsManager.getInstance().saveWheels();
-		SettingsManager.getInstance().saveLabUsers();
 		SettingsManager.getInstance().saveMapRenders();
 	}
 	

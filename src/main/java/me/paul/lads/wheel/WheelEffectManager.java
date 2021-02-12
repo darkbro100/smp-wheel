@@ -6,21 +6,14 @@ import java.util.Set;
 import java.util.SplittableRandom;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.EnderDragon.Phase;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.reflections.Reflections;
 
 import lombok.Getter;
-import me.paul.lads.util.Duration;
-import net.md_5.bungee.api.ChatColor;
 
 public class WheelEffectManager {
 
@@ -68,8 +61,8 @@ public class WheelEffectManager {
 
 		// world, x, y, z, yaw, pitch
 
-		String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
-				+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
+//		String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
+//				+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
 
 		effects.add(new WheelEffect() {
 			public void play(Player spinner, Wheel spun) {
@@ -83,7 +76,7 @@ public class WheelEffectManager {
 		});
 
 
-//		effects.add(WheelImageEffect.create("/home/carson/smplive/plugins/wheelimage/troll.png"));
+//		effects.add(WheelImageEffect.create("/smplive/plugins/wheelimage/troll.png"));
 
 		// REPLACE DIRECTORY WITH NEW IMAGES
 

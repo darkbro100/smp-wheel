@@ -38,7 +38,7 @@ public class Meteor {
 		this.spawn = l;
 		MinecraftSphere s = new MinecraftSphere(l, radius);
 
-		for (Location face : s.getFaces(12)) {
+		for (Location face : s.getFaces(24)) {
 			ArmorStand as = face.getWorld().spawn(face, ArmorStand.class);
 			as.setGravity(false);
 			as.setHelmet(new ItemStack(Util.getRandomEntry(materials)));
