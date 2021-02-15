@@ -44,8 +44,8 @@ public class TestEffect extends WheelEffect {
 	}
 	
 	private void giveMap(RenderedMap map, Player p) {
-		MapView view = Bukkit.createMap(map.getWorld());
-		map.getRenderers().forEach(view::addRenderer);
+		MapView view = Bukkit.createMap(map.getView().getWorld());
+		map.getView().getRenderers().forEach(view::addRenderer);
         MapMeta mapMeta = (MapMeta) Bukkit.getItemFactory().getItemMeta(Material.FILLED_MAP);
         mapMeta.setMapView(view);
         

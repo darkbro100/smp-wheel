@@ -25,8 +25,6 @@ public class Main extends JavaPlugin implements Listener {
 	@Getter
 	private static Main instance = null;
 	
-	private Thread discordThread;
-	
 	@Getter
 	private long startTime;
 	
@@ -57,7 +55,6 @@ public class Main extends JavaPlugin implements Listener {
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new WheelInteract(), this);
 		pm.registerEvents(this, this);
-		
 	}
 	
 	@EventHandler
