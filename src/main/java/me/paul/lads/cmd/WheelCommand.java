@@ -79,9 +79,7 @@ public class WheelCommand implements CommandExecutor {
 				}
 
 				final Location center = ((Player) sender).getLocation();
-				Wheel wheel = new Wheel(center, radius, 6, offsetInc, frequency, Material.DIAMOND_BLOCK,
-						Material.GOLD_BLOCK, Material.IRON_BLOCK, Material.COAL_BLOCK, Material.EMERALD_BLOCK,
-						Material.REDSTONE_BLOCK);
+				Wheel wheel = new Wheel(center, radius, 6, offsetInc, frequency, Material.RED_WOOL, Material.ORANGE_WOOL, Material.YELLOW_WOOL, Material.GREEN_WOOL, Material.BLUE_WOOL, Material.MAGENTA_WOOL, Material.PURPLE_WOOL, Material.PINK_WOOL);
 				wheel.draw();
 				sender.sendMessage("made wheel with id: " + wheel.getId());
 
@@ -94,6 +92,11 @@ public class WheelCommand implements CommandExecutor {
 				sender.sendMessage("/wheel <radius> <offset inc> <freq>");
 				sender.sendMessage("/wheel start <id> [-f]");
 				sender.sendMessage("/wheel setbutton <id>");
+			}
+
+			if(Wheel.getWheels().isEmpty()) {
+				sender.sendMessage(ChatColor.RED + "There are currently no wheels setup");
+				return true;
 			}
 
 			Wheel w = Wheel.get(1);
