@@ -2,10 +2,16 @@ package me.paul.lads;
 
 import java.util.List;
 
+import me.paul.lads.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.server.MapInitializeEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.PluginManager;
@@ -65,7 +71,7 @@ public class Main extends JavaPlugin implements Listener {
 			List<MapRenderer> renders = SettingsManager.getInstance().provide(view.getId());
 			view.getRenderers().clear();
 			renders.forEach(view::addRenderer);
-		}	
+		}
 	}
 }
 	
