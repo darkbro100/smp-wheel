@@ -79,7 +79,7 @@ public class WheelCommand implements CommandExecutor {
 				}
 
 				final Location center = ((Player) sender).getLocation();
-				Wheel wheel = new Wheel(center, radius, 6, offsetInc, frequency, Material.RED_WOOL, Material.ORANGE_WOOL, Material.YELLOW_WOOL, Material.GREEN_WOOL, Material.BLUE_WOOL, Material.MAGENTA_WOOL, Material.PURPLE_WOOL, Material.PINK_WOOL);
+				Wheel wheel = new Wheel(center, radius, 6, offsetInc, frequency, Material.RED_CONCRETE, Material.ORANGE_CONCRETE, Material.YELLOW_CONCRETE, Material.GREEN_CONCRETE, Material.BLUE_CONCRETE, Material.MAGENTA_CONCRETE, Material.PURPLE_CONCRETE, Material.PINK_CONCRETE);
 				wheel.draw();
 				sender.sendMessage("made wheel with id: " + wheel.getId());
 
