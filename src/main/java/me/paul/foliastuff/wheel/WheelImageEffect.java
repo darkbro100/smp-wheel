@@ -4,8 +4,10 @@ import com.github.johnnyjayjay.spigotmaps.MapBuilder;
 import com.github.johnnyjayjay.spigotmaps.RenderedMap;
 import com.github.johnnyjayjay.spigotmaps.rendering.ImageRenderer;
 import com.github.johnnyjayjay.spigotmaps.util.ImageTools;
+import com.google.common.collect.Lists;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.SettingsManager;
+import me.paul.foliastuff.util.Util;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,13 +20,18 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class WheelImageEffect extends WheelEffect {
 
-  private BufferedImage image;
+  private final List<BufferedImage> images = Lists.newArrayList();
 
   private WheelImageEffect(BufferedImage image) {
-    this.image = image;
+    this.images.add(image);
+  }
+
+  private WheelImageEffect(List<BufferedImage> images) {
+    this.images.addAll(images);
   }
 
   @Override
@@ -34,6 +41,7 @@ public class WheelImageEffect extends WheelEffect {
   }
 
   public void giveMap(Player p) {
+    BufferedImage image = Util.getRandomEntry(images);
     ImageRenderer renderer = ImageRenderer.create(image);
     RenderedMap map = MapBuilder.create().addRenderers(renderer).store(SettingsManager.getInstance()).world(p.getWorld()).build();
     giveMap(map, p);
@@ -74,6 +82,27 @@ public class WheelImageEffect extends WheelEffect {
     }
 
     return null;
+  }
+
+  public static WheelImageEffect create(List<String> filePaths) {
+    List<BufferedImage> images = Lists.newArrayList();
+    for (String str : filePaths) {
+      File file = new File(str);
+
+      try {
+        BufferedImage image = ImageIO.read(file);
+        image = ImageTools.resizeToMapSize(image);
+        images.add(image);
+      } catch (IOException e) {
+        FoliaStuff.getInstance().getLogger().warning("Failed to load image: " + str);
+        e.printStackTrace();
+      }
+    }
+
+    if (images.isEmpty())
+      return null;
+
+    return new WheelImageEffect(images);
   }
 
 }

@@ -1,7 +1,11 @@
 package me.paul.foliastuff.wheel;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.Duration;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -58,11 +62,7 @@ public class WheelEffectManager {
     // Manual Registrations. Easy Effects that don't really require creating a whole
     // new class/file for them\
 
-    // world, x, y, z, yaw, pitch
-
-//		String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC
-//				+ " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
-
+    // levitation effect
     effects.add(new WheelEffect() {
       public void play(Player spinner, Wheel spun) {
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -72,16 +72,36 @@ public class WheelEffectManager {
             p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1f);
           }, null);
         }
-        Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " bought everyone a hot balloon ride, except there's no balloon. And also no parachutes.");
+        Bukkit.broadcast(Component.text(spinner.getName() + " bought everyone a hot balloon ride, except there's no balloon. And also no parachutes.").color(TextColor.color(0, 255, 120)));
       }
     });
 
-    // REPLACE DIRECTORY WITH NEW IMAGES
+    // slow mining effect
+    effects.add(new WheelEffect() {
+      @Override
+      public void play(Player spinner, Wheel spun) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+          p.getScheduler().run(FoliaStuff.getInstance(), task -> {
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Duration.minutes(2).ticks(), 3, false, false, false));
+            p.sendMessage(Component.text("You feel slow af...").color(TextColor.color(120, 55, 2)));
+          }, null);
+        }
+      }
+
+    });
+
+    // image effects.
     File imagesDir = new File(FoliaStuff.getInstance().getDataFolder() + File.separator + "wheel_images");
+    List<String> imagePaths = Lists.newArrayList();
+
     if (imagesDir.exists() && imagesDir.isDirectory()) {
       for (File f : Objects.requireNonNull(imagesDir.listFiles()))
-        effects.add(WheelImageEffect.create(f.getAbsolutePath()));
+        imagePaths.add(f.getAbsolutePath());
     }
+
+    WheelImageEffect imageEffect = WheelImageEffect.create(imagePaths);
+    if (imageEffect != null)
+      effects.add(imageEffect);
 
     FoliaStuff.getInstance().getLogger().info("Loaded " + effects.size() + " effects...");
   }
