@@ -139,8 +139,8 @@ public class TaskBuilder implements Runnable {
     } else
       this.runnable = runnable;
 
-    FoliaStuff.getInstance().getLogger().info("Interval: " + interval);
-    FoliaStuff.getInstance().getLogger().info("Delay: " + delay);
+//    FoliaStuff.getInstance().getLogger().info("Interval: " + interval);
+//    FoliaStuff.getInstance().getLogger().info("Delay: " + delay);
 
     if (interval == -1L && cycles == 0) { //Only to be ran once
       if (delay == -1L) {
