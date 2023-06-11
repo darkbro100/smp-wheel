@@ -18,13 +18,12 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 @GenerateEffect(description = "Link everyone's lives", key = "effect_lifelink", name = "LifeLink")
 public class LifeLink extends WheelEffect implements Listener {
-  String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC + " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
   private String spinner;
 
   public void play(Player spinner, Wheel spun) {
     this.spinner = spinner.getName();
-    spinner.sendMessage(this.prefix + " Your life is now LINKED.");
-    Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + "Your life is now LINKED", ChatColor.DARK_RED + "One person dies, everyone dies.", 10, 20 * 5, 10));
+    spinner.sendMessage(PREFIX + " Your life is now LINKED.");
+    Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + "Your life is now LINKED", ChatColor.DARK_RED + this.spinner + " dies, everyone dies.", 10, 20 * 5, 10));
     for (int i = 0; i < 7; i++) {
       Sync.get(spinner).delay(i * 5).run(() -> Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 10f, 0f)));
     }
@@ -35,7 +34,7 @@ public class LifeLink extends WheelEffect implements Listener {
 
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent e) {
-    if (!looping) {
+    if (!looping && e.getEntity().getName().equalsIgnoreCase(spinner)) {
       looping = true;
       e.deathMessage(Component.empty());
 
