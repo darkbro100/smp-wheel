@@ -1,0 +1,30 @@
+name: $name
+version: $version
+main: me.paul.foliastuff.other.FoliaStuff
+description: $description
+folia-supported: true
+
+load: POSTWORLD
+authors:
+  - paulyg
+api-version: $apiVersion
+
+commands:
+  home:
+    description: TP to home
+  sethome:
+    description: Set home
+  wheel:
+    description: Interact with the wheel
+    default: true
+  wheeleffect:
+    description: Test wheel effect
+    op: true
+    aliases: [we]
+  displayname:
+    description: Change display name
+    aliases: [dn]
+  image:
+    description: Display image/gif
+    aliases: [gif]
+    op: true
