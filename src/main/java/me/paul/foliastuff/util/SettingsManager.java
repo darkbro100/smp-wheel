@@ -156,11 +156,11 @@ public class SettingsManager implements MapStorage {
       }
 
       if (renders.isEmpty()) {
-        FoliaStuff.getInstance().getLogger().info("Found no renders for map id: " + id);
+//        FoliaStuff.getInstance().getLogger().info("Found no renders for map id: " + id);
         continue;
       }
 
-      FoliaStuff.getInstance().getLogger().info("Loaded map render: " + id);
+//      FoliaStuff.getInstance().getLogger().info("Loaded map render: " + id);
       storedMaps.put(id, renders);
     }
   }
