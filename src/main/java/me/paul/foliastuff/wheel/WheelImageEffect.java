@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class WheelImageEffect extends WheelEffect {
 
@@ -61,12 +62,14 @@ public class WheelImageEffect extends WheelEffect {
     final int beforeSlot = p.getInventory().getHeldItemSlot();
     p.getInventory().setItem(beforeSlot, itemStack);
 
-    if (before != null && before.getType() != Material.AIR)
-      p.getInventory().addItem(before);
-
-//        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-//        	p.getInventory().setItem(beforeSlot, before);
-//        }, 20L * 5L);
+    if (before.getType() != Material.AIR) {
+      Map<Integer, ItemStack> drops = p.getInventory().addItem(before);
+      if (!drops.isEmpty()) {
+        for (ItemStack drop : drops.values()) {
+          p.getWorld().dropItemNaturally(p.getLocation(), drop);
+        }
+      }
+    }
   }
 
   public static WheelImageEffect create(String fileUrl) {
