@@ -12,10 +12,12 @@ import me.paul.foliastuff.wheel.Wheel;
 import me.paul.foliastuff.wheel.WheelEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -49,7 +51,14 @@ public class ScrambleEffect extends WheelEffect implements Listener {
     correctAnswer = str;
     lastSpinner = spinner.getUniqueId();
 
+    // Alert the spinner
     spinner.sendMessage(Component.text(PREFIX).append(Component.text(" What word is this? ").append(Component.text(scrambled)).append(Component.text(" You have 15 seconds."))));
+    spinner.sendTitle(ChatColor.DARK_RED + ChatColor.BOLD.toString() + "Unscramble Word:", scrambled, 10, 20 * 5, 10);
+    for (int i = 0; i < 7; i++) {
+      Sync.get(spinner).delay(i * 5).run(() -> spinner.playSound(spinner.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 10f, 0f));
+    }
+
+    // register stuff
     Bukkit.getPluginManager().registerEvents(this, FoliaStuff.getInstance());
     this.task = Sync.get(spinner).delay(Duration.seconds(15)).run(() -> {
       if (!correct) {

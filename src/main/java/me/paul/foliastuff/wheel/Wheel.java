@@ -229,10 +229,42 @@ public class Wheel implements Runnable {
     fw.getScheduler().runDelayed(FoliaStuff.getInstance(), task -> fw.detonate(), null, 2);
   }
 
+  /**
+   * Play sounds and launch fireworks after a wheel has finished spinning.
+   */
+  private void celebrate() {
+    // Play sound
+    center.getWorld().playSound(center, Sound.ENTITY_ENDER_DRAGON_DEATH, 0.4F, 1.0F);
+
+    // Play fireworks
+    Bukkit.getRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), center, new Consumer<>() {
+      int fireworksExploded;
+      final int fireworkDelay = 5;
+      int ran = 0;
+
+      @Override
+      public void accept(ScheduledTask task) {
+        if (fireworksExploded > 35) {
+          task.cancel();
+          return;
+        }
+
+        if (ran % fireworkDelay == 0) {
+          launchFirework();
+          fireworksExploded++;
+        }
+
+        ran++;
+      }
+    }, 1, 1);
+
+  }
+
   @Override
   public void run() {
     if (execWait == 0) {
       WheelEffect effect = WheelEffectManager.getInstance().getRandomEffect();
+
       if (shouldReverse || effect instanceof KeepGoingEffect) {
         execWait++;
         reverse = true;
@@ -245,34 +277,11 @@ public class Wheel implements Runnable {
       resetRunnable();
 
       Player player = Bukkit.getPlayer(lastSpinner);
-      if (shouldPlay && player != null && player.isOnline()) {
+      if (shouldPlay && player != null && player.isOnline())
         effect.play(player, this);
-      }
 
-      // Play sound
-      center.getWorld().playSound(center, Sound.ENTITY_ENDER_DRAGON_DEATH, 0.4F, 1.0F);
-
-      // Play fireworks
-      Bukkit.getRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), center, new Consumer<ScheduledTask>() {
-        int fireworksExploded;
-        final int fireworkDelay = 5;
-        int ran = 0;
-
-        @Override
-        public void accept(ScheduledTask task) {
-          if (fireworksExploded > 35) {
-            task.cancel();
-            return;
-          }
-
-          if (ran % fireworkDelay == 0) {
-            launchFirework();
-            fireworksExploded++;
-          }
-
-          ran++;
-        }
-      }, 1, 1);
+      // sound/fireworks
+      celebrate();
 
       return;
     }
