@@ -7,6 +7,7 @@ import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.scheduler.Sync;
+import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.wheel.GenerateEffect;
 import me.paul.foliastuff.wheel.Wheel;
 import me.paul.foliastuff.wheel.WheelEffect;
@@ -27,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,7 +83,7 @@ public class ScrambleEffect extends WheelEffect implements Listener {
     });
   }
 
-  private ScheduledTask task;
+  private Object task;
   private boolean correct = false;
   private String answerInput = "";
   private String correctAnswer = "";
@@ -118,7 +120,12 @@ public class ScrambleEffect extends WheelEffect implements Listener {
     correctAnswer = "";
     answerInput = "";
     correct = false;
-    task.cancel();
+
+    if(TaskBuilder.isFoliaSupported()) {
+      ((ScheduledTask) task).cancel();
+    } else {
+      ((BukkitTask) task).cancel();
+    }
   }
 
   private boolean verifyAnswer() {

@@ -1,10 +1,11 @@
 package me.paul.foliastuff.wheel.effects;
 
 import com.google.common.collect.Lists;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.Util;
+import me.paul.foliastuff.util.scheduler.Sync;
+import me.paul.foliastuff.util.scheduler.TaskHolder;
 import me.paul.foliastuff.wheel.GenerateEffect;
 import me.paul.foliastuff.wheel.Wheel;
 import me.paul.foliastuff.wheel.WheelEffect;
@@ -23,7 +24,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.Vector;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 @GenerateEffect(key = "creeper_fucked", description = "CREEPER-PHOBIA", name = "Creeper Rain")
 public class CreeperEffect extends WheelEffect implements Listener {
@@ -38,7 +38,7 @@ public class CreeperEffect extends WheelEffect implements Listener {
     // broadcast
     Bukkit.broadcast(Component.text("Creeper time has begun... :)").color(TextColor.color(0, 120, 0)));
 
-    Bukkit.getGlobalRegionScheduler().runDelayed(FoliaStuff.getInstance(), task -> {
+    Sync.get(spinner).delay(Duration.minutes(2).ticks()).run(() -> {
       // broadcast
       Bukkit.broadcast(Component.text("Creeper time has ended... :(").color(TextColor.color(120, 0, 0)));
 
@@ -48,15 +48,16 @@ public class CreeperEffect extends WheelEffect implements Listener {
       // despawn entities
       ents.forEach(ent -> ent.getScheduler().run(FoliaStuff.getInstance(), t -> ent.remove(), null));
       ents.clear();
-    }, Duration.minutes(2).ticks());
+    });
 
-    Bukkit.getGlobalRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), new Consumer<ScheduledTask>() {
+    TaskHolder holder = new TaskHolder();
+    Sync.get(spinner).holder(holder).interval(1).run(new Runnable() {
       private int running;
 
       @Override
-      public void accept(ScheduledTask task) {
+      public void run() {
         if (running >= Duration.minutes(2).toTicks()) {
-          task.cancel();
+          holder.cancel();
           return;
         }
 
@@ -71,7 +72,7 @@ public class CreeperEffect extends WheelEffect implements Listener {
 
         running++;
       }
-    }, 1, 1);
+    });
   }
 
   @EventHandler

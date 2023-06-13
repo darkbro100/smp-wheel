@@ -3,11 +3,13 @@ package me.paul.foliastuff.wheel;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
-import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Cooldown;
 import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.LocUtil;
 import me.paul.foliastuff.util.Util;
+import me.paul.foliastuff.util.scheduler.Sync;
+import me.paul.foliastuff.util.scheduler.TaskBuilder;
+import me.paul.foliastuff.util.scheduler.TaskHolder;
 import me.paul.foliastuff.wheel.effects.KeepGoingEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -16,10 +18,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 @Getter
 public class Wheel implements Runnable {
@@ -56,7 +58,7 @@ public class Wheel implements Runnable {
   private Location buttonBlock;
 
   private boolean started = false;
-  private ScheduledTask wheelTask;
+  private Object wheelTask;
 
   private UUID lastSpinner = null;
 
@@ -140,7 +142,7 @@ public class Wheel implements Runnable {
     Runnable onDone = () -> Bukkit.broadcast(Component.text("The Wacky Wheel is ready to spin.").color(TextColor.color(0, 255, 0)));
     lastSpin = DEBUG ? new Cooldown(Duration.minutes(0.1)).onDone(onDone) : new Cooldown(Duration.minutes(2)).onDone(onDone);
 
-    this.wheelTask = Bukkit.getRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), center, task -> run(), 1, 1);
+    this.wheelTask = Sync.get(center).interval(1).run(this);
     return true;
   }
 
@@ -226,7 +228,7 @@ public class Wheel implements Runnable {
     fw.setFireworkMeta(meta);
 
     // delay ignite the firework
-    fw.getScheduler().runDelayed(FoliaStuff.getInstance(), task -> fw.detonate(), null, 2);
+    Sync.get(fw).delay(2).run(fw::detonate);
   }
 
   /**
@@ -237,15 +239,15 @@ public class Wheel implements Runnable {
     center.getWorld().playSound(center, Sound.ENTITY_ENDER_DRAGON_DEATH, 0.4F, 1.0F);
 
     // Play fireworks
-    Bukkit.getRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), center, new Consumer<>() {
+    TaskHolder fireworkHolder = new TaskHolder();
+    Sync.get(center).holder(fireworkHolder).interval(1).run(new Runnable() {
       int fireworksExploded;
       final int fireworkDelay = 5;
       int ran = 0;
 
-      @Override
-      public void accept(ScheduledTask task) {
+      public void run() {
         if (fireworksExploded > 35) {
-          task.cancel();
+          fireworkHolder.cancel();
           return;
         }
 
@@ -256,7 +258,7 @@ public class Wheel implements Runnable {
 
         ran++;
       }
-    }, 1, 1);
+    });
 
   }
 
@@ -376,7 +378,11 @@ public class Wheel implements Runnable {
     originalExecWait = execWait;
 
     // Cancel the task
-    wheelTask.cancel();
+    if (TaskBuilder.isFoliaSupported()) {
+      ((ScheduledTask) wheelTask).cancel();
+    } else {
+      ((BukkitTask) wheelTask).cancel();
+    }
     wheelTask = null;
   }
 

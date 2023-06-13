@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFallingBlock;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftFallingBlock;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -56,7 +56,7 @@ public class FlyingWheelEffect extends WheelEffect {
         FallingBlock fb = spinner.getWorld().spawnFallingBlock(loc.clone().add(0.5, 0.5, 0.5), material.createBlockData());
         fb.setDropItem(false);
 
-        FallingBlockEntity fbe = ((CraftFallingBlock)fb).getHandle();
+        FallingBlockEntity fbe = ((CraftFallingBlock) fb).getHandle();
         fbe.noPhysics = true;
 
         blocks.add(fb);

@@ -5,11 +5,11 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Duration;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -18,6 +18,21 @@ import java.util.concurrent.TimeUnit;
 @Builder
 @Getter
 public class TaskBuilder implements Runnable {
+
+  private static final boolean FOLIA = classExists("io.papermc.paper.threadedregions.RegionizedServer");
+
+  public static boolean classExists(String className) {
+    try {
+      Class.forName(className);
+      return true;
+    } catch (ClassNotFoundException ex) {
+      return false;
+    }
+  }
+
+  public static boolean isFoliaSupported() {
+    return FOLIA;
+  }
 
   public static Set<TaskBuilder> hardRuns = Sets.newConcurrentHashSet();
 
@@ -35,7 +50,12 @@ public class TaskBuilder implements Runnable {
   private Entity entity;
   @Nullable
   private Location location;
+
+  // For Folia
   private ScheduledTask task;
+
+  // For when Folia is not being used
+  private BukkitTask bukkitTask;
   private boolean hardRun;
   private TaskHolder holder;
 
@@ -130,7 +150,7 @@ public class TaskBuilder implements Runnable {
     return this;
   }
 
-  public ScheduledTask run(Runnable runnable) {
+  public Object run(Runnable runnable) {
     if (onCycleEnd != null) {
       this.runnable = () -> {
         runnable.run();
@@ -139,9 +159,14 @@ public class TaskBuilder implements Runnable {
     } else
       this.runnable = runnable;
 
-//    FoliaStuff.getInstance().getLogger().info("Interval: " + interval);
-//    FoliaStuff.getInstance().getLogger().info("Delay: " + delay);
+    if (isFoliaSupported()) {
+      return foliaTaskSetup();
+    } else {
+      return spigotTaskSetup();
+    }
+  }
 
+  private ScheduledTask foliaTaskSetup() {
     if (interval == -1L && cycles == 0) { //Only to be ran once
       if (delay == -1L) {
         if (location != null) {
@@ -157,7 +182,6 @@ public class TaskBuilder implements Runnable {
         }
       }
     } else {
-
       if (location != null) {
         return this.task = plugin.getServer().getRegionScheduler().runAtFixedRate(plugin, location, task -> run(), delay == -1L ? 1 : delay, interval == -1L ? 1 : interval);
       } else if (entity != null) {
@@ -165,8 +189,19 @@ public class TaskBuilder implements Runnable {
       }
     }
 
-    //Should never happen
     return null;
+  }
+
+  private BukkitTask spigotTaskSetup() {
+    if (interval == -1L && cycles == 0) { //Only to be ran once
+      if (delay == -1L) {
+        return this.bukkitTask = plugin.getServer().getScheduler().runTask(plugin, this);
+      } else {
+        return this.bukkitTask = plugin.getServer().getScheduler().runTaskLater(plugin, this, delay);
+      }
+    } else {
+      return this.bukkitTask = plugin.getServer().getScheduler().runTaskTimer(plugin, this, delay == -1L ? 1 : delay, interval == -1L ? 1 : interval);
+    }
   }
 
   protected int count = 0;
@@ -174,7 +209,11 @@ public class TaskBuilder implements Runnable {
   @Override
   public void run() {
     if (holder != null && holder.isCancelled()) {
-      task.cancel();
+      if(isFoliaSupported()) {
+        task.cancel();
+      } else {
+        bukkitTask.cancel();
+      }
       return;
     }
 
@@ -183,7 +222,12 @@ public class TaskBuilder implements Runnable {
     count++;
 
     if (cycles > 0 && count >= cycles) {
-      task.cancel();
+      if(isFoliaSupported()) {
+        task.cancel();
+      } else {
+        bukkitTask.cancel();
+      }
+
       if (hardRun)
         hardRuns.remove(this);
     }

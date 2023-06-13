@@ -1,7 +1,7 @@
 plugins {
   `java-library`
   id("io.papermc.paperweight.userdev") version "1.5.5"
-  id("xyz.jpenilla.run-paper") version "2.0.1" // Adds runServer and runMojangMappedServer tasks for testing
+  id("xyz.jpenilla.run-paper") version "2.1.0" // Adds runServer and runMojangMappedServer tasks for testing
 
   // Shades and relocates dependencies into our plugin jar. See https://imperceptiblethoughts.com/shadow/introduction/
   id("com.github.johnrengelman.shadow") version "8.1.1"
@@ -18,6 +18,7 @@ java {
 
 repositories {
   mavenCentral()
+  mavenLocal()
 
   maven {
     url = uri("https://oss.sonatype.org/content/groups/public/")
@@ -29,10 +30,10 @@ repositories {
 }
 
 dependencies {
-  paperweight.foliaDevBundle("1.19.4-R0.1-SNAPSHOT")
+   paperweight.foliaDevBundle("1.20-R0.1-SNAPSHOT")
 
   implementation("org.reflections:reflections:0.10.2")
-  implementation("com.github.johnnyjayjay:spigot-maps:2.1.1")
+  implementation("com.github.johnnyjayjay:spigot-maps:2.1.2")
   compileOnly ("org.projectlombok:lombok:1.18.28")
   annotationProcessor ("org.projectlombok:lombok:1.18.28")
   testCompileOnly ("org.projectlombok:lombok:1.18.28")
@@ -61,7 +62,7 @@ tasks {
       "name" to project.name,
       "version" to project.version,
       "description" to project.description,
-      "apiVersion" to "1.19"
+      "apiVersion" to "\"1.20\""
     )
     inputs.properties(props)
     filesMatching("plugin.yml") {

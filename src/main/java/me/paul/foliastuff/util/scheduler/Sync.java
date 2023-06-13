@@ -14,6 +14,10 @@ public class Sync {
     this.builder = builder;
   }
 
+  public static TaskBuilder get() {
+    return new Sync(TaskBuilder.buildSync(FoliaStuff.getInstance())).getBuilder().delay(-1).interval(-1);
+  }
+
   public static TaskBuilder get(Entity ent) {
     return new Sync(TaskBuilder.build(FoliaStuff.getInstance(), ent)).getBuilder().delay(-1).interval(-1);
   }

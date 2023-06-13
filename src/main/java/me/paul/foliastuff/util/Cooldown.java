@@ -2,13 +2,16 @@ package me.paul.foliastuff.util;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.scheduler.Sync;
+import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 public class Cooldown {
 
   private long expiry;
   private Runnable onDone;
-  private ScheduledTask task;
+  private Object task;
 
   /**
    * Create a new cooldown
@@ -27,17 +30,34 @@ public class Cooldown {
    */
   public Cooldown onDone(Runnable r) {
     this.onDone = r;
-    this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), task -> {
-      if (hasExpired()) {
-        task.cancel();
-        onDone.run();
-      }
-    }, 1, 5);
+
+    if (TaskBuilder.isFoliaSupported()) {
+      this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(FoliaStuff.getInstance(), task -> {
+        if (hasExpired()) {
+          task.cancel();
+          if (onDone != null)
+            onDone.run();
+        }
+      }, 1, 5);
+    } else {
+      this.task = Sync.get().interval(5).run(() -> {
+        if (hasExpired()) {
+          cancelTask();
+          if (onDone != null)
+            onDone.run();
+        }
+      });
+    }
     return this;
   }
 
   private void cancelTask() {
-    task.cancel();
+    if (TaskBuilder.isFoliaSupported()) {
+      ((ScheduledTask) task).cancel();
+    } else {
+      ((BukkitTask) task).cancel();
+    }
+
     onDone.run();
 
     task = null;

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Duration;
+import me.paul.foliastuff.util.scheduler.Sync;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -66,11 +67,11 @@ public class WheelEffectManager {
     effects.add(new WheelEffect() {
       public void play(Player spinner, Wheel spun) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-          p.getScheduler().run(FoliaStuff.getInstance(), task -> {
+          Sync.get(p).run(() -> {
             p.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 20 * 40, 7));
             p.sendTitle(ChatColor.BLUE + "Up, up and away!!", "It's not flying, it's falling, with style.", 10, 20 * 4, 10);
             p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1f);
-          }, null);
+          });
         }
         Bukkit.broadcast(Component.text(spinner.getName() + " bought everyone a hot balloon ride, except there's no balloon. And also no parachutes.").color(TextColor.color(0, 255, 120)));
       }
@@ -81,10 +82,10 @@ public class WheelEffectManager {
       @Override
       public void play(Player spinner, Wheel spun) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-          p.getScheduler().run(FoliaStuff.getInstance(), task -> {
+          Sync.get(p).run(() -> {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, Duration.minutes(2).ticks(), 3, false, false, false));
             p.sendMessage(Component.text("You feel slow af...").color(TextColor.color(120, 55, 2)));
-          }, null);
+          });
         }
       }
 

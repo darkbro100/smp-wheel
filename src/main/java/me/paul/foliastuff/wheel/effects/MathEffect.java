@@ -8,6 +8,7 @@ import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.WeightedRandomizer;
 import me.paul.foliastuff.util.scheduler.Sync;
+import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.wheel.GenerateEffect;
 import me.paul.foliastuff.wheel.Wheel;
 import me.paul.foliastuff.wheel.WheelEffect;
@@ -23,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Map;
@@ -150,7 +152,7 @@ public class MathEffect extends WheelEffect implements Listener {
     });
   }
 
-  private ScheduledTask task;
+  private Object task;
   private boolean correct = false;
   private double answerInput = 0.0d;
   private double correctAnswer = 0.0d;
@@ -188,7 +190,12 @@ public class MathEffect extends WheelEffect implements Listener {
     correctAnswer = 0.0d;
     answerInput = 0.0d;
     correct = false;
-    task.cancel();
+
+    if(TaskBuilder.isFoliaSupported()) {
+      ((ScheduledTask) task).cancel();
+    } else {
+      ((BukkitTask) task).cancel();
+    }
   }
 
   private boolean verifyAnswer() {
