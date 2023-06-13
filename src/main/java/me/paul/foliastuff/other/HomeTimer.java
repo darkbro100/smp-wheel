@@ -1,6 +1,7 @@
 package me.paul.foliastuff.other;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import me.paul.foliastuff.util.scheduler.TaskHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
@@ -20,7 +21,7 @@ public class HomeTimer {
     private int passed;
     private Location lastLoc;
 
-    public void run(ScheduledTask task) {
+    public void run(TaskHolder task) {
         Location loc = player.getLocation();
         if (lastLoc != null && !LocUtil.matches(loc, lastLoc)) {
             player.sendMessage(Component.text("You moved! Stopped teleport.").color(TextColor.color(175, 70, 0)));
