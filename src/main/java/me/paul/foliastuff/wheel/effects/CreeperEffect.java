@@ -46,7 +46,7 @@ public class CreeperEffect extends WheelEffect implements Listener {
       HandlerList.unregisterAll(this);
 
       // despawn entities
-      ents.forEach(ent -> ent.getScheduler().run(FoliaStuff.getInstance(), t -> ent.remove(), null));
+      ents.forEach(ent -> Sync.get(ent).run(ent::remove));
       ents.clear();
     });
 

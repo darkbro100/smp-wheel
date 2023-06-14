@@ -1,9 +1,12 @@
 package me.paul.foliastuff.cmd;
 
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,14 +15,54 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class TestCaseCommand implements CommandExecutor {
 
-  private static final Case caseInst;
+  @Override
+  public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    if (!(commandSender instanceof Player player))
+      return false;
 
-  static {
+    Case caseInst = Case.get(0);
+    if (caseInst == null)
+      caseInst = createBasicCase();
+
+    if (caseInst.location() == null)
+      caseInst.location(player.getLocation().getBlock().getLocation().clone().add(0.1, 0, 0.5));
+
+    CompletableFuture<Pair<CaseItem, ItemStack>> future = new CompletableFuture<>();
+    caseInst.spin(future);
+    future.whenComplete((pair, ex) -> {
+      if (ex != null) {
+        ex.printStackTrace();
+        return;
+      }
+
+      ItemStack it = pair.getSecond();
+      CaseItem caseItem = pair.getFirst();
+
+      @NotNull HashMap<Integer, ItemStack> map = player.getInventory().addItem(it);
+      if (!map.isEmpty())
+        map.values().forEach(it2 -> player.getWorld().dropItemNaturally(player.getLocation(), it2));
+
+      Bukkit.broadcast(player.displayName()
+        .append(Component.text(" got a ")
+          .color(TextColor.color(255, 255, 255)))
+        .append(Component.text(caseItem.getRarity().name())
+          .color(caseItem.getRarity().getColor()))
+        .append(Component.text(" item!")
+          .color(TextColor.color(255, 255, 255))));
+    });
+
+    player.sendMessage(Component.text("Spinning case..."));
+
+    return false;
+  }
+
+  private Case createBasicCase() {
     List<ItemStack> blues = Lists.newArrayList();
     blues.add(new ItemStack(Material.DIRT));
     blues.add(new ItemStack(Material.SCAFFOLDING));
@@ -50,35 +93,10 @@ public class TestCaseCommand implements CommandExecutor {
     gold.add(new ItemStack(Material.ZOMBIE_HEAD));
     gold.add(new ItemStack(Material.CREEPER_HEAD));
 
-    caseInst = new Case(new CaseItem(CaseItem.CaseRarity.BLUE).add(blues),
+    return new Case(new CaseItem(CaseItem.CaseRarity.BLUE).add(blues),
       new CaseItem(CaseItem.CaseRarity.PURPLE).add(purples),
       new CaseItem(CaseItem.CaseRarity.PINK).add(pinks),
       new CaseItem(CaseItem.CaseRarity.RED).add(reds),
       new CaseItem(CaseItem.CaseRarity.GOLD).add(gold));
-  }
-
-
-  @Override
-  public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
-    if (!(commandSender instanceof Player player))
-      return false;
-
-    if (caseInst.location() == null)
-      caseInst.location(player.getLocation().getBlock().getLocation().clone().add(0.1, 0, 0.5));
-
-    CompletableFuture<ItemStack> future = new CompletableFuture<>();
-    caseInst.spin(future);
-    future.whenComplete((it, ex) -> {
-      if (ex != null) {
-        ex.printStackTrace();
-        return;
-      }
-
-      player.sendMessage(Component.text(it.toString()));
-    });
-
-    player.sendMessage(Component.text("Spinning case..."));
-
-    return false;
   }
 }

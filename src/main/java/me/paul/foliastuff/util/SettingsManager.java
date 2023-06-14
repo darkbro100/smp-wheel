@@ -3,11 +3,14 @@ package me.paul.foliastuff.util;
 import com.github.johnnyjayjay.spigotmaps.MapStorage;
 import com.github.johnnyjayjay.spigotmaps.rendering.ImageRenderer;
 import com.google.common.collect.Lists;
+import me.paul.foliastuff.Case;
+import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.wheel.Wheel;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapRenderer;
 
 import javax.imageio.ImageIO;
@@ -61,6 +64,74 @@ public class SettingsManager implements MapStorage {
    * int radius; private int pieces; private Material[] parts; private int
    * offsetInc; private int updateFrequency; private int lastAngle = 0;
    */
+  public void loadCases() {
+    File dir = new File(FoliaStuff.getInstance().getDataFolder(), "cases");
+    if (!dir.exists()) {
+      dir.mkdir();
+      return;
+    }
+
+    for (File f : dir.listFiles()) {
+      if (!f.getName().endsWith(".yml"))
+        continue;
+
+      YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
+      List<CaseItem> items = new ArrayList<>();
+
+      Location center = LocUtil.locFromString(config.getString("location"));
+      Case caseInstance = new Case();
+
+      for (String key : config.getConfigurationSection("items").getKeys(false)) {
+        String path = "items." + key;
+        CaseItem.CaseRarity rarity = CaseItem.CaseRarity.of(key);
+        CaseItem caseItem = new CaseItem(rarity);
+
+        for (String itemKey : config.getConfigurationSection(path + ".drops").getKeys(false)) {
+          ItemStack stack = config.getItemStack(path + ".drops." + itemKey);
+          FoliaStuff.getInstance().getLogger().info("Loaded " + stack + " for rarity " + rarity.name());
+          caseItem.add(stack);
+        }
+
+        caseInstance.add(caseItem);
+        caseInstance.location(center);
+
+        FoliaStuff.getInstance().getLogger().info("Loaded caseitem " + rarity.name());
+      }
+    }
+  }
+
+  public void saveCases() {
+    File dir = new File(FoliaStuff.getInstance().getDataFolder(), "cases");
+    if (!dir.exists()) {
+      dir.mkdir();
+      return;
+    }
+
+    for(File f : dir.listFiles())
+      f.delete();
+
+    for (Case c : Case.getCases()) {
+      File f = new File(dir, c.getId() + ".yml");
+      YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
+
+      config.set("location", LocUtil.locToString(c.location()));
+
+      for (CaseItem item : c.getItems()) {
+        String path = "items." + item.getRarity().name();
+        ItemStack[] items = item.drops();
+
+        for (int i = 0; i < items.length; i++) {
+          config.set(path + ".drops." + i, items[i]);
+        }
+      }
+
+      try {
+        config.save(f);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 
   public void loadWheels() {
     if (!wheelConfig.isConfigurationSection("wheels"))

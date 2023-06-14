@@ -27,6 +27,7 @@ public final class FoliaStuff extends JavaPlugin {
     instance = this;
 
     SettingsManager.getInstance().setup();
+    SettingsManager.getInstance().loadCases();
     SettingsManager.getInstance().loadWheels();
     SettingsManager.getInstance().loadMapRenders();
 
@@ -52,6 +53,7 @@ public final class FoliaStuff extends JavaPlugin {
   public void onDisable() {
     SettingsManager.getInstance().saveWheels();
     SettingsManager.getInstance().saveMapRenders();
+    SettingsManager.getInstance().saveCases();
     // Plugin shutdown logic
   }
 

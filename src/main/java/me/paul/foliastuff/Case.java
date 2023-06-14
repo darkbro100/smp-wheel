@@ -1,6 +1,8 @@
 package me.paul.foliastuff;
 
 import com.google.common.collect.Maps;
+import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
 import me.paul.foliastuff.util.WeightedRandomizer;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
@@ -15,6 +17,8 @@ public class Case {
   private static final Map<Integer, Case> cases = Maps.newHashMap();
 
   private final WeightedRandomizer<CaseItem> items;
+
+  @Getter
   private final int id;
   private Location location;
   private CaseRunnable runnable;
@@ -29,9 +33,17 @@ public class Case {
     cases.put(this.id, this);
   }
 
+  public static Case[] getCases() {
+    return cases.values().toArray(new Case[0]);
+  }
+
   public Case add(CaseItem item) {
     items.add(item, item.getRarity().weight);
     return this;
+  }
+
+  public CaseItem[] getItems() {
+    return items.getWeightMap().keySet().toArray(new CaseItem[0]);
   }
 
   /**
@@ -70,7 +82,7 @@ public class Case {
    *
    * @param future Future
    */
-  public void spin(CompletableFuture<ItemStack> future) {
+  public void spin(CompletableFuture<Pair<CaseItem, ItemStack>> future) {
     TaskHolder holder = new TaskHolder();
     this.runnable = new CaseRunnable(holder, this, future);
     Sync.get(this.location).holder(holder).interval(1).run(this.runnable);

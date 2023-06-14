@@ -1,22 +1,32 @@
 package me.paul.foliastuff;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.concurrent.CompletableFuture;
 
 public class CaseReceiveItemRunnable implements Runnable {
 
   private final Item item;
+  private final ItemStack stack;
+  private final CaseItem caseItem;
   private final TaskHolder holder;
+  private final CompletableFuture<Pair<CaseItem, ItemStack>> future;
 
-  public CaseReceiveItemRunnable(Item item, TaskHolder holder) {
+  public CaseReceiveItemRunnable(Item item, CaseItem caseItem, ItemStack stack, TaskHolder holder, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
+    this.caseItem = caseItem;
     this.item = item;
+    this.stack = stack;
     this.holder = holder;
+    this.future = future;
   }
 
   private int ticks;
@@ -34,11 +44,12 @@ public class CaseReceiveItemRunnable implements Runnable {
   public void run() {
     if (ticks >= LIMIT.ticks()) {
       item.getWorld().playSound(item.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.5f);
-//      item.getLocation().getWorld().createExplosion(item.getLocation(), 4, false, false);
       hollowSphereParticles();
 
       item.remove();
       holder.cancel();
+
+      future.complete(new Pair<>(caseItem, stack));
     }
 
     item.getWorld().playSound(item.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, pitch);
@@ -46,9 +57,9 @@ public class CaseReceiveItemRunnable implements Runnable {
     helix();
 
     pitch += pitchUp ? 0.05f : -0.05f;
-    if(pitch >= 2F)
+    if (pitch >= 2F)
       pitchUp = true;
-    else if(pitch <= 0.5f)
+    else if (pitch <= 0.5f)
       pitchUp = false;
 
     ticks++;
@@ -80,6 +91,7 @@ public class CaseReceiveItemRunnable implements Runnable {
   }
 
   private double y = 0;
+
   private void helix() {
     double x = radius * Math.cos(y * 10);
     double z = radius * Math.sin(y * 10);

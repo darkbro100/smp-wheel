@@ -3,6 +3,7 @@ package me.paul.foliastuff;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import me.paul.foliastuff.util.Util;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -35,6 +36,10 @@ public class CaseItem {
     return this;
   }
 
+  public ItemStack[] drops() {
+    return drops.toArray(new ItemStack[0]);
+  }
+
   public ItemStack generateItem() {
     return Util.getRandomEntry(drops);
   }
@@ -52,17 +57,32 @@ public class CaseItem {
     return Objects.hash(rarity, drops);
   }
 
+  @Getter
   public enum CaseRarity {
-    BLUE(79_920),
-    PURPLE(15_980),
-    PINK(3_200),
-    RED(640),
-    GOLD(260);
+    BLUE(79_920, TextColor.color(0, 0, 125)),
+    PURPLE(15_980, TextColor.color(125, 0, 125)),
+    PINK(3_200, TextColor.color(255, 85, 255)),
+    RED(640, TextColor.color(125, 0, 0)),
+    GOLD(260, TextColor.color(255, 170, 0));
+
+    private static final CaseRarity[] VALUES = values();
 
     final int weight;
+    final TextColor color;
 
-    CaseRarity(int w) {
+    CaseRarity(int w, TextColor c) {
       weight = w;
+      color = c;
+    }
+
+    public static CaseRarity of(String key) {
+      for(CaseRarity rarity : VALUES) {
+        if(rarity.name().equalsIgnoreCase(key)) {
+          return rarity;
+        }
+      }
+
+      return null;
     }
   }
 

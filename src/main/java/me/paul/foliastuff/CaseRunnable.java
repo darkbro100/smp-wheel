@@ -1,6 +1,7 @@
 package me.paul.foliastuff;
 
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.scheduler.Sync;
@@ -19,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CaseRunnable implements Runnable {
 
-  private static final Duration LIMIT = Duration.seconds(5.5);
+  private static final Duration LIMIT = Duration.seconds(6);
   private static final Duration END_DELAY = Duration.seconds(2);
   private static final int MAX_ITEMS = 5;
 
@@ -41,9 +42,9 @@ public class CaseRunnable implements Runnable {
   private static final int WINNING_TICKET = 109;
   private Item winningItemInstance;
 
-  private CompletableFuture<ItemStack> future;
+  private CompletableFuture<Pair<CaseItem, ItemStack>> future;
 
-  public CaseRunnable(TaskHolder holder, Case caseInst, CompletableFuture<ItemStack> future) {
+  public CaseRunnable(TaskHolder holder, Case caseInst, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
     this.future = future;
     this.holder = holder;
     this.caseInst = caseInst;
@@ -51,7 +52,7 @@ public class CaseRunnable implements Runnable {
     while(this.winningItem.getRarity() != CaseItem.CaseRarity.GOLD)
       this.winningItem = caseInst.generateItem();
 
-    this.winningItemStack = winningItem.generateItem();
+    this.winningItemStack = winningItem.generateItem().clone();
 
     this.maxLeft = caseInst.location().clone().add(-0.1, 0, 0).add(-((double) MAX_ITEMS / 2), 0, 0);
 
@@ -72,8 +73,6 @@ public class CaseRunnable implements Runnable {
         holder.cancel();
         SPEED.setX(-0.5);
 
-        future.complete(winningItemStack);
-
         // clear other items
         for(Item it : itemCycle) {
           if(it.equals(winningItemInstance))
@@ -85,7 +84,7 @@ public class CaseRunnable implements Runnable {
 
         // exec cosmetic runnable
         TaskHolder endHolder = new TaskHolder();
-        Sync.get(winningItemInstance).interval(1).holder(endHolder).run(new CaseReceiveItemRunnable(winningItemInstance, endHolder));
+        Sync.get(winningItemInstance).interval(1).holder(endHolder).run(new CaseReceiveItemRunnable(winningItemInstance, winningItem, winningItemStack, endHolder, future));
 
         return;
       }
@@ -98,7 +97,7 @@ public class CaseRunnable implements Runnable {
       }
 
       // set speed to 0 if the winning item is gonna leave
-      if (winningItemInstance.getLocation().getX() < (caseInst.location().getX() + 0.25))
+      if (winningItemInstance.getLocation().getX() < (caseInst.location().getX() - 0.75))
         SPEED.multiply(0);
 
       // add new item in case
@@ -152,7 +151,7 @@ public class CaseRunnable implements Runnable {
   }
 
   private Item drop(CaseItem item, int offset) {
-    ItemStack it = item.equals(winningItem) ? winningItemStack.clone() : item.generateItem();
+    ItemStack it = item.equals(winningItem) ? winningItemStack.clone() : item.generateItem().clone();
     it.setAmount(1);
 
     ItemMeta meta = it.getItemMeta();
