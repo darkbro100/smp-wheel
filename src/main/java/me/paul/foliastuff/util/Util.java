@@ -23,6 +23,7 @@ public class Util {
     return list.get(random(list.size()));
   }
 
+  @SafeVarargs
   public static <T> T getRandomEntry(T... args) {
     return args[random(args.length)];
   }

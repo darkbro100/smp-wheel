@@ -2,8 +2,7 @@ package me.paul.foliastuff.other;
 
 import com.github.johnnyjayjay.spigotmaps.InitializationListener;
 import lombok.Getter;
-import me.paul.foliastuff.cmd.WheelCommand;
-import me.paul.foliastuff.cmd.WheelEffectCommand;
+import me.paul.foliastuff.cmd.*;
 import me.paul.foliastuff.listeners.WheelListener;
 import me.paul.foliastuff.util.SettingsManager;
 import me.paul.foliastuff.wheel.WheelEffectManager;
@@ -35,6 +34,7 @@ public final class FoliaStuff extends JavaPlugin {
     getCommand("wheeleffect").setExecutor(new WheelEffectCommand());
     getCommand("displayname").setExecutor(new DisplayNameCommand());
     getCommand("gif").setExecutor(new DisplayImageCommand());
+    getCommand("case").setExecutor(new TestCaseCommand());
 
     registerListeners();
 

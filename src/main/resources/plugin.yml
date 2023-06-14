@@ -28,3 +28,6 @@ commands:
     description: Display image/gif
     aliases: [gif]
     op: true
+  case:
+    description: open a case smiley
+    op: true

@@ -1,4 +1,4 @@
-package me.paul.foliastuff.other;
+package me.paul.foliastuff.cmd;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;

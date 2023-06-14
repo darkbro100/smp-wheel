@@ -1,4 +1,4 @@
-package me.paul.foliastuff.other;
+package me.paul.foliastuff.cmd;
 
 import com.github.johnnyjayjay.spigotmaps.MapBuilder;
 import com.github.johnnyjayjay.spigotmaps.RenderedMap;
@@ -7,6 +7,7 @@ import com.github.johnnyjayjay.spigotmaps.rendering.GifRenderer;
 import com.github.johnnyjayjay.spigotmaps.rendering.ImageRenderer;
 import com.github.johnnyjayjay.spigotmaps.util.ImageTools;
 import com.madgag.gif.fmsware.GifDecoder;
+import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.SettingsManager;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;

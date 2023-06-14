@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -45,6 +46,9 @@ public class WheelListener implements Listener {
   @EventHandler
   public void onDamage(EntityDamageByEntityEvent e) {
     if (e.getEntity() instanceof Item && e.getDamager() instanceof ArmorStand)
+      e.setCancelled(true);
+
+    if(e.getEntity() instanceof Player && e.getDamager() instanceof Item && e.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)
       e.setCancelled(true);
 
     if (e.getEntity() instanceof Player) {
