@@ -38,6 +38,10 @@ public class Util {
     return RANDOM.nextInt(max);
   }
 
+  public static double random() {
+    return RANDOM.nextDouble();
+  }
+
   /**
    * Retrieve random numbers inbetween [min, max]
    *

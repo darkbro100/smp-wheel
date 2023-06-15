@@ -2,7 +2,9 @@ package me.paul.foliastuff.other;
 
 import com.github.johnnyjayjay.spigotmaps.InitializationListener;
 import lombok.Getter;
+import me.paul.foliastuff.Case;
 import me.paul.foliastuff.cmd.*;
+import me.paul.foliastuff.listeners.CaseListener;
 import me.paul.foliastuff.listeners.WheelListener;
 import me.paul.foliastuff.util.SettingsManager;
 import me.paul.foliastuff.wheel.WheelEffectManager;
@@ -54,13 +56,13 @@ public final class FoliaStuff extends JavaPlugin {
     SettingsManager.getInstance().saveWheels();
     SettingsManager.getInstance().saveMapRenders();
     SettingsManager.getInstance().saveCases();
-    // Plugin shutdown logic
   }
 
   private void registerListeners() {
     PluginManager pm = Bukkit.getPluginManager();
     pm.registerEvents(new WheelListener(), this);
-    getServer().getPluginManager().registerEvents(new TreeFellerListener(), this);
+    pm.registerEvents(new CaseListener(), this);
+    pm.registerEvents(new TreeFellerListener(), this);
   }
 
   public static FoliaStuff getInstance() {

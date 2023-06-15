@@ -75,13 +75,12 @@ public class TestCaseCommand implements CommandExecutor {
     purples.add(new ItemStack(Material.NETHERRACK));
 
     List<ItemStack> pinks = Lists.newArrayList();
-    pinks.add(new ItemStack(Material.GOLD_INGOT, 3));
+    pinks.add(new ItemStack(Material.GOLD_INGOT, 5));
     pinks.add(new ItemStack(Material.IRON_INGOT, 16));
-    pinks.add(new ItemStack(Material.ENCHANTING_TABLE));
+    pinks.add(new ItemStack(Material.DIAMOND, 3));
 
     List<ItemStack> reds = Lists.newArrayList();
-    reds.add(new ItemStack(Material.DIAMOND, 5));
-    reds.add(new ItemStack(Material.EMERALD, 5));
+    reds.add(new ItemStack(Material.EMERALD, 15));
     reds.add(new ItemStack(Material.ANCIENT_DEBRIS, 1));
 
     List<ItemStack> gold = Lists.newArrayList();

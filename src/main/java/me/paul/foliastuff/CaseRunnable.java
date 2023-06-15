@@ -1,13 +1,16 @@
 package me.paul.foliastuff;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Duration;
+import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -20,8 +23,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CaseRunnable implements Runnable {
 
-  private static final Duration LIMIT = Duration.seconds(6);
-  private static final Duration END_DELAY = Duration.seconds(2);
+  private static final Duration LIMIT = Duration.seconds(5.6);
   private static final int MAX_ITEMS = 5;
 
   private final TaskHolder holder;
@@ -29,6 +31,7 @@ public class CaseRunnable implements Runnable {
 
   private int ticks = 0;
   private int endTicks = 0;
+  private int endDelay = 0;
 
   private final List<Item> itemCycle = Lists.newArrayListWithCapacity(MAX_ITEMS);
 
@@ -49,33 +52,37 @@ public class CaseRunnable implements Runnable {
     this.holder = holder;
     this.caseInst = caseInst;
     this.winningItem = caseInst.generateItem();
-    while(this.winningItem.getRarity() != CaseItem.CaseRarity.GOLD)
-      this.winningItem = caseInst.generateItem();
-
     this.winningItemStack = winningItem.generateItem().clone();
 
     this.maxLeft = caseInst.location().clone().add(-0.1, 0, 0).add(-((double) MAX_ITEMS / 2), 0, 0);
 
     for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++)
-      itemCycle.add(drop(caseInst.generateItem(), i));
+      itemCycle.add(drop(caseInst.generateItem(), i, false));
   }
+
+  private static final double END_DEC = -0.02;
 
   @Override
   public void run() {
     //if time is up stop
     if (ticks >= LIMIT.ticks()) {
 
-      if(!SPEED.isZero() && endTicks % 10 == 0)
-        SPEED.add(new Vector(0.03, 0, 0));
+      // randomly make the ending wait 2-3 seconds
+      if (endTicks == 0) {
+        endDelay = Util.random(40, 60);
+      }
+
+      if (SPEED.getX() < END_DEC && endTicks != 0 && endTicks % 5 == 0)
+        SPEED.add(new Vector(-END_DEC, 0, 0));
 
       // once the end state has ended
-      if (endTicks >= END_DELAY.ticks()) {
+      if (endTicks >= endDelay) {
         holder.cancel();
         SPEED.setX(-0.5);
 
         // clear other items
-        for(Item it : itemCycle) {
-          if(it.equals(winningItemInstance))
+        for (Item it : itemCycle) {
+          if (it.equals(winningItemInstance))
             continue;
 
           it.remove();
@@ -83,9 +90,28 @@ public class CaseRunnable implements Runnable {
         itemCycle.clear();
 
         // exec cosmetic runnable
-        TaskHolder endHolder = new TaskHolder();
-        Sync.get(winningItemInstance).interval(1).holder(endHolder).run(new CaseReceiveItemRunnable(winningItemInstance, winningItem, winningItemStack, endHolder, future));
+        CaseItem.CaseRarity rarity = winningItem.getRarity();
+        if (rarity == CaseItem.CaseRarity.GOLD || rarity == CaseItem.CaseRarity.RED) {
+          TaskHolder endHolder = new TaskHolder();
+          Sync.get(winningItemInstance).interval(1).holder(endHolder).run(new CaseReceiveItemRunnable(winningItemInstance, winningItem, winningItemStack, endHolder, future));
+        } else {
+          Vector offset = new Vector(Util.random(), Util.random(), Util.random());
 
+          if (rarity == CaseItem.CaseRarity.PURPLE || rarity == CaseItem.CaseRarity.BLUE) {
+            winningItemInstance.getWorld().playSound(winningItemInstance.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
+            new ParticleBuilder(Particle.VILLAGER_ANGRY).location(winningItemInstance.getLocation()).offset(offset.getX(), offset.getY(), offset.getZ()).count(25).spawn();
+          } else {
+            winningItemInstance.getWorld().playSound(winningItemInstance.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, 1, 1);
+            new ParticleBuilder(Particle.VILLAGER_HAPPY).location(winningItemInstance.getLocation()).offset(offset.getX(), offset.getY(), offset.getZ()).count(25).spawn();
+          }
+
+          winningItemInstance.remove();
+          winningItemInstance = null;
+
+          future.complete(Pair.of(winningItem, winningItemStack));
+        }
+
+        caseInst.setRunning(false);
         return;
       }
 
@@ -130,9 +156,11 @@ public class CaseRunnable implements Runnable {
     if (shouldAdd) {
       // need to arbitarily insert the pre-chosen item into the list
       // so it appears in the middle
-      Item it = drop(ticks == WINNING_TICKET ? winningItem : caseInst.generateItem(), MAX_ITEMS / 2);
-      if (ticks == WINNING_TICKET)
+      boolean winner = ticks == WINNING_TICKET;
+      Item it = drop(winner ? winningItem : caseInst.generateItem(), MAX_ITEMS / 2, winner);
+      if (winner)
         winningItemInstance = it;
+
       itemCycle.add(it);
 
       caseInst.location().getWorld().playSound(caseInst.location(), Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
@@ -150,8 +178,8 @@ public class CaseRunnable implements Runnable {
     }
   }
 
-  private Item drop(CaseItem item, int offset) {
-    ItemStack it = item.equals(winningItem) ? winningItemStack.clone() : item.generateItem().clone();
+  private Item drop(CaseItem item, int offset, boolean winner) {
+    ItemStack it = winner ? winningItemStack.clone() : item.generateItem().clone();
     it.setAmount(1);
 
     ItemMeta meta = it.getItemMeta();
