@@ -15,6 +15,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -54,7 +55,8 @@ public class CaseRunnable implements Runnable {
     this.winningItem = caseInst.generateItem();
     this.winningItemStack = winningItem.generateItem().clone();
 
-    this.maxLeft = caseInst.location().clone().add(-0.1, 0, 0).add(-((double) MAX_ITEMS / 2), 0, 0);
+    double maxOffset = -((double) MAX_ITEMS / 2);
+    this.maxLeft = caseInst.location().clone().add(-0.1, 0, 0).add(maxOffset - 0.1, 0, 0);
 
     for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++)
       itemCycle.add(drop(caseInst.generateItem(), i, false));
@@ -120,6 +122,7 @@ public class CaseRunnable implements Runnable {
         Item item = itemCycle.get(i);
         item.setVelocity(SPEED);
         checkItem(item);
+        updateBlock(item, true);
       }
 
       // set speed to 0 if the winning item is gonna leave
@@ -141,15 +144,26 @@ public class CaseRunnable implements Runnable {
     for (int i = itemCycle.size() - 1; i >= 0; i--) {
       Item item = itemCycle.get(i);
       item.setVelocity(SPEED);
-
       // mark for removal
       checkItem(item);
+      updateBlock(item, false);
     }
 
     // add new item to the end of the cycle
     addNewItem();
 
     ticks++;
+  }
+
+  private void updateBlock(Item item, boolean particle) {
+    CaseItem.CaseRarity rarity = CaseItem.CaseRarity.of(item.getMetadata("color").get(0).asString());
+    Location behindBlock = item.getLocation().clone().add(0, -1, 0);
+    behindBlock.getBlock().setType(rarity.blockType);
+
+    if (particle && ticks % 2 == 0) {
+      Location particleLoc = item.getLocation().clone().add(0, 0.25, 0.3);
+      new ParticleBuilder(Particle.REDSTONE).color(rarity.getColor().red(), rarity.getColor().green(), rarity.getColor().blue()).location(particleLoc).extra(0).count(1).spawn();
+    }
   }
 
   private void addNewItem() {
@@ -186,13 +200,14 @@ public class CaseRunnable implements Runnable {
     meta.displayName(Component.text(UUID.randomUUID().toString()));
     it.setItemMeta(meta);
 
-    Location spawnLoc = caseInst.location().clone().add(offset, 0.0, 0);
+    Location spawnLoc = caseInst.location().clone().add(offset == 2 ? 1.9 : offset, 0.0, 0);
 
     return caseInst.location().getWorld().dropItem(spawnLoc, it, d -> {
       d.setVelocity(SPEED);
       d.setGravity(false);
       d.setCanPlayerPickup(false);
       d.setCanMobPickup(false);
+      d.setMetadata("color", new FixedMetadataValue(FoliaStuff.getInstance(), item.getRarity().name()));
     });
   }
 }

@@ -142,7 +142,7 @@ public class MathEffect extends WheelEffect implements Listener {
     }
 
     Bukkit.getPluginManager().registerEvents(this, FoliaStuff.getInstance());
-    this.task = Sync.get(spinner).delay(Duration.seconds(2)).run(() -> {
+    this.task = Sync.get(spinner).delay(Duration.seconds(5)).run(() -> {
       if (!correct) {
         spinner.sendMessage(Component.text(PREFIX).append(Component.text(" You suck. Enjoy the ride! :>")));
         spinner.teleportAsync(spinner.getLocation().clone().add(0, 255, 0));

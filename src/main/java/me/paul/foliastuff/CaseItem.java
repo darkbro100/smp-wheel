@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import me.paul.foliastuff.util.Util;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -59,20 +60,22 @@ public class CaseItem {
 
   @Getter
   public enum CaseRarity {
-    BLUE(79_920, TextColor.color(0, 0, 125)),
-    PURPLE(15_980, TextColor.color(125, 0, 125)),
-    PINK(3_200, TextColor.color(255, 85, 255)),
-    RED(640, TextColor.color(125, 0, 0)),
-    GOLD(260, TextColor.color(255, 170, 0));
+    BLUE(79_920, TextColor.color(0, 0, 125), Material.BLUE_WOOL),
+    PURPLE(15_980, TextColor.color(125, 0, 125), Material.PURPLE_WOOL),
+    PINK(3_200, TextColor.color(255, 85, 255), Material.PINK_WOOL),
+    RED(640, TextColor.color(125, 0, 0), Material.RED_WOOL),
+    GOLD(260, TextColor.color(255, 170, 0), Material.YELLOW_WOOL);
 
     private static final CaseRarity[] VALUES = values();
 
     final int weight;
     final TextColor color;
+    final Material blockType;
 
-    CaseRarity(int w, TextColor c) {
+    CaseRarity(int w, TextColor c, Material b) {
       weight = w;
       color = c;
+      blockType = b;
     }
 
     public static CaseRarity of(String key) {
