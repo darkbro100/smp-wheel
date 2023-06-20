@@ -16,6 +16,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @GenerateEffect(description = "Link everyone's lives", key = "effect_lifelink", name = "LifeLink")
 public class LifeLink extends WheelEffect implements Listener {
   private String spinner;
@@ -30,23 +32,26 @@ public class LifeLink extends WheelEffect implements Listener {
     Bukkit.getPluginManager().registerEvents(this, FoliaStuff.getInstance());
   }
 
-  boolean looping = false;
+  AtomicBoolean looping = new AtomicBoolean(false);
 
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent e) {
-    if (!looping && e.getEntity().getName().equalsIgnoreCase(spinner)) {
-      looping = true;
+    if (!looping.get() && e.getEntity().getName().equalsIgnoreCase(spinner)) {
+      looping.set(true);
       e.deathMessage(Component.empty());
 
       Component dumbass = e.getEntity().displayName();
-      Bukkit.getOnlinePlayers().forEach(player -> {
-        if (player.getHealth() > 0 && !player.isDead()) {
+
+      // ensure this is wrapped in a sync block, so folia doesn't bork itself
+      Bukkit.getOnlinePlayers().forEach(player -> Sync.get(player).run(() -> {
+        player.playSound(player.getLocation(), Sound.MUSIC_DISC_WARD, 1.0f, 1.0f);
+        player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1.0f, 1.0f);
+
+        if (player.getHealth() > 0 && !player.isDead())
           player.setHealth(0);
-        }
-      });
-      looping = false;
-      Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.MUSIC_DISC_WARD, 1.0f, 1.0f));
-      Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1.0f, 1.0f));
+      }));
+      looping.set(false);
+
       Bukkit.broadcast(dumbass.append(Component.text(" died and ruined it for everyone.").color(TextColor.color(125, 0, 0))));
 
       HandlerList.unregisterAll(this);

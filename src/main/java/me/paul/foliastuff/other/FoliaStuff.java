@@ -49,6 +49,7 @@ public final class FoliaStuff extends JavaPlugin {
     instance = this;
 
     InitializationListener.register(SettingsManager.getInstance(), this);
+
   }
 
   @Override

@@ -4,7 +4,10 @@ import com.destroystokyo.paper.ParticleBuilder;
 import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -12,6 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.concurrent.CompletableFuture;
+
+import static me.paul.foliastuff.CaseRunnable.MAX_ITEMS;
 
 public class CaseReceiveItemRunnable implements Runnable {
 
@@ -21,12 +26,15 @@ public class CaseReceiveItemRunnable implements Runnable {
   private final TaskHolder holder;
   private final CompletableFuture<Pair<CaseItem, ItemStack>> future;
 
-  public CaseReceiveItemRunnable(Item item, CaseItem caseItem, ItemStack stack, TaskHolder holder, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
+  private final Case caseInst;
+
+  public CaseReceiveItemRunnable(Case caseInst, Item item, CaseItem caseItem, ItemStack stack, TaskHolder holder, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
     this.caseItem = caseItem;
     this.item = item;
     this.stack = stack;
     this.holder = holder;
     this.future = future;
+    this.caseInst = caseInst;
   }
 
   private int ticks;
@@ -48,8 +56,16 @@ public class CaseReceiveItemRunnable implements Runnable {
 
       item.remove();
       holder.cancel();
+      caseInst.spinner = null;
 
+      caseInst.displayEntity().text(Component.text("Right Click to Spin!").color(TextColor.color(0x965613)));
       future.complete(new Pair<>(caseItem, stack));
+
+      // update floor
+      for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
+        Location loc = caseInst.location().add(i - 0.2, -1, 0);
+        loc.getBlock().setType(Material.BLACK_WOOL);
+      }
     }
 
     item.getWorld().playSound(item.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, pitch);

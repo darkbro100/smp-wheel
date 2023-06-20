@@ -9,7 +9,9 @@ import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -25,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 public class CaseRunnable implements Runnable {
 
   private static final Duration LIMIT = Duration.seconds(5.6);
-  private static final int MAX_ITEMS = 5;
+  protected static final int MAX_ITEMS = 5;
 
   private final TaskHolder holder;
   private final Case caseInst;
@@ -34,24 +36,26 @@ public class CaseRunnable implements Runnable {
   private int endTicks = 0;
   private int endDelay = 0;
 
-  private final List<Item> itemCycle = Lists.newArrayListWithCapacity(MAX_ITEMS);
+  protected final List<Item> itemCycle = Lists.newArrayListWithCapacity(MAX_ITEMS);
 
   private final Location maxLeft;
   private boolean shouldAdd = false;
 
   private static final Vector SPEED = new Vector(-0.5, 0, 0);
 
-  private CaseItem winningItem;
-  private final ItemStack winningItemStack;
+  protected CaseItem winningItem;
+  protected final ItemStack winningItemStack;
   private static final int WINNING_TICKET = 109;
   private Item winningItemInstance;
 
-  private CompletableFuture<Pair<CaseItem, ItemStack>> future;
+  protected CompletableFuture<Pair<CaseItem, ItemStack>> future;
 
   public CaseRunnable(TaskHolder holder, Case caseInst, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
     this.future = future;
     this.holder = holder;
     this.caseInst = caseInst;
+
+    // generate what the player wins
     this.winningItem = caseInst.generateItem();
     this.winningItemStack = winningItem.generateItem().clone();
 
@@ -59,7 +63,7 @@ public class CaseRunnable implements Runnable {
     this.maxLeft = caseInst.location().clone().add(-0.1, 0, 0).add(maxOffset - 0.1, 0, 0);
 
     for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++)
-      itemCycle.add(drop(caseInst.generateItem(), i, false));
+      this.itemCycle.add(drop(caseInst.generateItem(true), i, false));
   }
 
   private static final double END_DEC = -0.02;
@@ -70,9 +74,8 @@ public class CaseRunnable implements Runnable {
     if (ticks >= LIMIT.ticks()) {
 
       // randomly make the ending wait 2-3 seconds
-      if (endTicks == 0) {
+      if (endTicks == 0)
         endDelay = Util.random(40, 60);
-      }
 
       if (SPEED.getX() < END_DEC && endTicks != 0 && endTicks % 5 == 0)
         SPEED.add(new Vector(-END_DEC, 0, 0));
@@ -93,9 +96,9 @@ public class CaseRunnable implements Runnable {
 
         // exec cosmetic runnable
         CaseItem.CaseRarity rarity = winningItem.getRarity();
-        if (rarity == CaseItem.CaseRarity.GOLD || rarity == CaseItem.CaseRarity.RED) {
+        if (rarity == CaseItem.CaseRarity.ANCIENT || rarity == CaseItem.CaseRarity.GOLD || rarity == CaseItem.CaseRarity.RED) {
           TaskHolder endHolder = new TaskHolder();
-          Sync.get(winningItemInstance).interval(1).holder(endHolder).run(new CaseReceiveItemRunnable(winningItemInstance, winningItem, winningItemStack, endHolder, future));
+          Sync.get(winningItemInstance).interval(1).holder(endHolder).run(new CaseReceiveItemRunnable(caseInst, winningItemInstance, winningItem, winningItemStack, endHolder, future));
         } else {
           Vector offset = new Vector(Util.random(), Util.random(), Util.random());
 
@@ -109,11 +112,19 @@ public class CaseRunnable implements Runnable {
 
           winningItemInstance.remove();
           winningItemInstance = null;
+          caseInst.spinner = null;
 
+          caseInst.displayEntity().text(Component.text("Right Click to Spin!").color(TextColor.color(0x965613)));
           future.complete(Pair.of(winningItem, winningItemStack));
+
+          // update floor
+          for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
+            Location loc = caseInst.location().add(i - 0.2, -1, 0);
+            loc.getBlock().setType(Material.BLACK_WOOL);
+          }
         }
 
-        caseInst.setRunning(false);
+        caseInst.running.set(false);
         return;
       }
 
@@ -155,6 +166,12 @@ public class CaseRunnable implements Runnable {
     ticks++;
   }
 
+  public static void resetSpeed() {
+    SPEED.setX(-0.5);
+    SPEED.setY(0);
+    SPEED.setZ(0);
+  }
+
   private void updateBlock(Item item, boolean particle) {
     CaseItem.CaseRarity rarity = CaseItem.CaseRarity.of(item.getMetadata("color").get(0).asString());
     Location behindBlock = item.getLocation().clone().add(0, -1, 0);
@@ -171,7 +188,7 @@ public class CaseRunnable implements Runnable {
       // need to arbitarily insert the pre-chosen item into the list
       // so it appears in the middle
       boolean winner = ticks == WINNING_TICKET;
-      Item it = drop(winner ? winningItem : caseInst.generateItem(), MAX_ITEMS / 2, winner);
+      Item it = drop(winner ? winningItem : caseInst.generateItem(true), MAX_ITEMS / 2, winner);
       if (winner)
         winningItemInstance = it;
 

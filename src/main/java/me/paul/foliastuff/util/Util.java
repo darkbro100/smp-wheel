@@ -3,6 +3,7 @@ package me.paul.foliastuff.util;
 import com.google.common.collect.Lists;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -15,6 +16,16 @@ import java.util.SplittableRandom;
 public class Util {
 
   public static final SplittableRandom RANDOM = new SplittableRandom();
+
+  /**
+   * Formats the name of the given Enum to make it human readable.
+   *
+   * @param e The enum to format.
+   * @return The formatted string.
+   */
+  public static String formatEnum(Enum<?> e) {
+    return WordUtils.capitalizeFully(e.name().replaceAll("_", " "));
+  }
 
   /**
    * @return A random entry in the list.

@@ -2,9 +2,7 @@ package me.paul.foliastuff;
 
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.WeightedRandomizer;
 import me.paul.foliastuff.util.scheduler.Sync;
@@ -12,15 +10,18 @@ import me.paul.foliastuff.util.scheduler.TaskHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static me.paul.foliastuff.CaseRunnable.MAX_ITEMS;
 
 public class Case {
 
@@ -33,10 +34,13 @@ public class Case {
   private Location location;
   private CaseRunnable runnable;
 
+  protected UUID spinner;
+
   private TextDisplay displayEnt;
   private ArmorStand interactEnt;
-  @Getter @Setter(AccessLevel.PACKAGE)
-  private boolean running = false;
+
+  protected AtomicBoolean running = new AtomicBoolean(false);
+  private TaskHolder holder;
 
   public Case(CaseItem... items) {
     this.id = cases.size();
@@ -46,10 +50,40 @@ public class Case {
       this.items.add(ci, ci.getRarity().weight);
 
     cases.put(this.id, this);
+
+    // debug code to test the odds, ensure they are similar to CSGO
+//    FoliaStuff.getInstance().getLogger().info("TESTING SOMETHING IN 1 SECOND");
+//    Bukkit.getGlobalRegionScheduler().runDelayed(FoliaStuff.getInstance(), task -> {
+//      FoliaStuff.getInstance().getLogger().info("TESTING SOMETHING NOW");
+//
+//      for(int j = 0; j < 10; j++) {
+//        int ancientCount = 0, goldCount = 0;
+//        for(int i = 0; i < 20_000; i++) {
+//          CaseItem item = generateItem();
+//            if(item.getRarity() == CaseItem.CaseRarity.GOLD) {
+//            goldCount++;
+//          } else if(item.getRarity() == CaseItem.CaseRarity.ANCIENT) {
+//                        System.out.println("Found ancient item after " + i + " tries");
+//              ancientCount++;
+//            }
+//        }
+//
+//        double d = (double) ancientCount / 20_000;
+//        System.out.println("Ancient chance: " + (d * 100) + "%");
+//        d = (double) goldCount / 20_000;
+//        System.out.println("Gold chance: " + (d * 100) + "%");
+//
+//      }
+//
+//    }, 20);
   }
 
   public static Case[] getCases() {
     return cases.values().toArray(new Case[0]);
+  }
+
+  public boolean isRunning() {
+    return running.get();
   }
 
   public Case add(CaseItem item) {
@@ -87,23 +121,43 @@ public class Case {
   }
 
   protected CaseItem generateItem() {
-    return items.select();
+    return generateItem(false);
+  }
+
+  protected CaseItem generateItem(boolean skipGold) {
+    CaseItem item = items.select();
+
+    while (skipGold && item.getRarity() == CaseItem.CaseRarity.GOLD)
+      item = items.select();
+
+    return item;
   }
 
   public static Case get(int id) {
     return cases.get(id);
   }
 
+  public UUID spinner() {
+    return spinner;
+  }
+
   /**
    * Spins this case. Takes in a future to complete when the spinning is done.
    *
-   * @param future Future
+   * @param spinner Player opening this case
+   * @param future  Future
    */
-  public void spin(CompletableFuture<Pair<CaseItem, ItemStack>> future) {
-    TaskHolder holder = new TaskHolder();
+  public void spin(Player spinner, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
+    this.spinner = spinner.getUniqueId();
+
+    FoliaStuff.getInstance().getLogger().info("opening case");
+    this.holder = new TaskHolder();
     this.runnable = new CaseRunnable(holder, this, future);
-    this.running = true;
+    this.running.set(true);
     Sync.get(this.location).holder(holder).interval(1).run(this.runnable);
+
+    // Change the display text to "spinning"
+    displayEnt.text(Component.text("Spinning...").color(TextColor.color(125, 125, 125)));
   }
 
   public TextDisplay displayEntity() {
@@ -135,6 +189,7 @@ public class Case {
     displayEnt.setBillboard(Display.Billboard.CENTER);
     displayEnt.text(Component.text("Right Click to Spin!").color(TextColor.color(0x965613)));
 
+
     interactEnt = spawnLoc.getWorld().spawn(spawnLoc.clone().subtract(0, 1.65, 0), ArmorStand.class);
     interactEnt.setInvisible(true);
     interactEnt.setInvulnerable(true);
@@ -143,4 +198,34 @@ public class Case {
     interactEnt.setMetadata("caseId", new FixedMetadataValue(FoliaStuff.getInstance(), id));
   }
 
+  public void quickOpen() {
+    if (!holder.isCancelled()) {
+      FoliaStuff.getInstance().getLogger().info("quick opening case");
+      // cancel the task
+      holder.cancel();
+
+      // reset speed
+      CaseRunnable.resetSpeed();
+
+      // black wool floor
+      for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
+        Location loc = location.clone().add(i - 0.2, -1, 0);
+        loc.getBlock().setType(Material.BLACK_WOOL);
+      }
+
+      // delete all the items
+      runnable.itemCycle.forEach(item -> Sync.get(item).run(item::remove));
+
+      // complete the future
+      runnable.future.complete(Pair.of(runnable.winningItem, runnable.winningItemStack));
+
+      // wait 2 seconds, then update the display
+      Sync.get(location).delay(40).run(() -> {
+        this.running.set(false);
+
+        // reset display text
+        displayEntity().text(Component.text("Right Click to Spin!").color(TextColor.color(0x965613)));
+      });
+    }
+  }
 }

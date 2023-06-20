@@ -4,13 +4,17 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import me.paul.foliastuff.util.Util;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.SplittableRandom;
 
 public class CaseItem {
 
@@ -42,7 +46,20 @@ public class CaseItem {
   }
 
   public ItemStack generateItem() {
-    return Util.getRandomEntry(drops);
+    List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+    Player player = Util.getRandomEntry(players);
+
+    ItemStack it = Util.getRandomEntry(drops).clone();
+    if (it.getType() == Material.ENCHANTED_BOOK) {
+      Enchantment random = Util.getRandomEntry(Enchantment.values());
+      it.addUnsafeEnchantment(random, Util.random(1, random.getMaxLevel()));
+    } else if (it.getType() == Material.PLAYER_HEAD) {
+      SkullMeta meta = (SkullMeta) it.getItemMeta();
+      meta.setPlayerProfile(player.getPlayerProfile());
+      it.setItemMeta(meta);
+    }
+
+    return it;
   }
 
   @Override
@@ -60,11 +77,12 @@ public class CaseItem {
 
   @Getter
   public enum CaseRarity {
-    BLUE(79_920, TextColor.color(0, 0, 125), Material.BLUE_WOOL),
+    BLUE(79_894, TextColor.color(0, 0, 125), Material.BLUE_WOOL),
     PURPLE(15_980, TextColor.color(125, 0, 125), Material.PURPLE_WOOL),
     PINK(3_200, TextColor.color(255, 85, 255), Material.PINK_WOOL),
     RED(640, TextColor.color(125, 0, 0), Material.RED_WOOL),
-    GOLD(260, TextColor.color(255, 170, 0), Material.YELLOW_WOOL);
+    GOLD(260, TextColor.color(255, 170, 0), Material.YELLOW_WOOL),
+    ANCIENT(26, TextColor.color(255, 85, 0), Material.ORANGE_WOOL);
 
     private static final CaseRarity[] VALUES = values();
 
@@ -79,8 +97,8 @@ public class CaseItem {
     }
 
     public static CaseRarity of(String key) {
-      for(CaseRarity rarity : VALUES) {
-        if(rarity.name().equalsIgnoreCase(key)) {
+      for (CaseRarity rarity : VALUES) {
+        if (rarity.name().equalsIgnoreCase(key)) {
           return rarity;
         }
       }
