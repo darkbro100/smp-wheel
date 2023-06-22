@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-   paperweight.foliaDevBundle("1.20-R0.1-SNAPSHOT")
+   paperweight.foliaDevBundle("1.20.1-R0.1-SNAPSHOT")
 
   implementation("org.reflections:reflections:0.10.2")
   implementation("com.github.johnnyjayjay:spigot-maps:2.1.2")
