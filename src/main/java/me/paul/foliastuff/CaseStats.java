@@ -35,6 +35,10 @@ public class CaseStats {
     return stored.get(uuid);
   }
 
+  public static CaseStats[] getAll() {
+    return stored.values().toArray(new CaseStats[0]);
+  }
+
   public static void store(UUID uuid, CaseStats stats) {
     stored.put(uuid, stats);
   }

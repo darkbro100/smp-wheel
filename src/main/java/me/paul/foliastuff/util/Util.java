@@ -8,10 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.SplittableRandom;
+import java.text.NumberFormat;
+import java.util.*;
 
 public class Util {
 
@@ -176,6 +174,28 @@ public class Util {
 
   private static double lengthSq(double x, double z) {
     return (x * x) + (z * z);
+  }
+
+  public static final NumberFormat FORMAT = NumberFormat.getInstance(Locale.US);
+
+  public static String format(Object o) {
+    return FORMAT.format(o);
+  }
+
+  public static String format(int i) {
+    return FORMAT.format(i);
+  }
+
+  public static String format(double i) {
+    return FORMAT.format(i);
+  }
+
+  public static String format(long i) {
+    return FORMAT.format(i);
+  }
+
+  public static String format(float i) {
+    return FORMAT.format(i);
   }
 
 }

@@ -68,6 +68,14 @@ public class SettingsManager implements MapStorage {
     dataConfig = YamlConfiguration.loadConfiguration(dataFile);
   }
 
+  public void loadAllCaseStats() {
+    for (String key : dataConfig.getKeys(false)) {
+      UUID uuid = UUID.fromString(key);
+      CaseStats stats = load(uuid);
+      CaseStats.store(uuid, stats);
+    }
+  }
+
   public CaseStats load(UUID player) {
     if (!dataConfig.contains(player.toString()))
       return new CaseStats(player);
