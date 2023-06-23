@@ -1,6 +1,7 @@
 package me.paul.foliastuff.listeners;
 
 import com.mojang.datafixers.util.Pair;
+import io.github.miniplaceholders.api.MiniPlaceholders;
 import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.CaseStats;
@@ -9,6 +10,7 @@ import me.paul.foliastuff.util.SettingsManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -25,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public class CaseListener implements Listener {
 
@@ -46,6 +50,10 @@ public class CaseListener implements Listener {
     FoliaStuff.getInstance().getLogger().info("Loading case stats for: " + event.getPlayer().getName());
     CaseStats stats = SettingsManager.getInstance().load(event.getPlayer().getUniqueId());
     CaseStats.store(event.getPlayer().getUniqueId(), stats);
+
+    Player player = event.getPlayer();
+    final TagResolver playerResolver = MiniPlaceholders.getAudiencePlaceholders(player);
+    player.sendMessage(miniMessage().deserialize("Player Name: <test-expansion>", playerResolver));
   }
 
   @EventHandler

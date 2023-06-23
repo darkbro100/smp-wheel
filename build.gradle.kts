@@ -38,6 +38,8 @@ dependencies {
   annotationProcessor ("org.projectlombok:lombok:1.18.28")
   testCompileOnly ("org.projectlombok:lombok:1.18.28")
   testAnnotationProcessor ("org.projectlombok:lombok:1.18.28")
+
+  compileOnly("io.github.miniplaceholders:miniplaceholders-api:2.1.0")
 }
 
 tasks {
