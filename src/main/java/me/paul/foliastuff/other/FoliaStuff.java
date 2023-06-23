@@ -130,9 +130,8 @@ public final class FoliaStuff extends JavaPlugin {
       });
       expansionBuilder.globalPlaceholder("total_" + rarity.name().toLowerCase() + "_percentage", (ctx, queue) -> {
         double total = 0;
-        for(Player player : Bukkit.getOnlinePlayers()) {
-          CaseStats stats = CaseStats.get(player.getUniqueId());
-          total += stats.getChance(rarity);
+        for(CaseStats caseStats : CaseStats.getAll()) {
+          total += caseStats.getChance(rarity);
         }
         DecimalFormat df = new DecimalFormat("##.##");
         return Tag.selfClosingInserting(Component.text(df.format(total * 100)));
