@@ -47,16 +47,15 @@ public class CaseListener implements Listener {
 
 
   //TODO: undo this if we ever move to some type of DB solution (prolly sqlite)
-//  @EventHandler
-//  public void onJoin(PlayerJoinEvent event) {
-//    FoliaStuff.getInstance().getLogger().info("Loading case stats for: " + event.getPlayer().getName());
-//    CaseStats stats = SettingsManager.getInstance().load(event.getPlayer().getUniqueId());
-//    CaseStats.store(event.getPlayer().getUniqueId(), stats);
-//
-//    Player player = event.getPlayer();
-//    final TagResolver playerResolver = MiniPlaceholders.getAudiencePlaceholders(player);
-//    // player.sendMessage(miniMessage().deserialize("Player Name: <test-expansion>", playerResolver));
-//  }
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    FoliaStuff.getInstance().getLogger().info("Loading case stats for: " + event.getPlayer().getName());
+    CaseStats stats = CaseStats.get(event.getPlayer().getUniqueId());
+    if(stats == null) {
+      stats = SettingsManager.getInstance().load(event.getPlayer().getUniqueId());
+      CaseStats.store(event.getPlayer().getUniqueId(), stats);
+    }
+  }
 
 //  @EventHandler
 //  public void onQuit(PlayerQuitEvent event) {
