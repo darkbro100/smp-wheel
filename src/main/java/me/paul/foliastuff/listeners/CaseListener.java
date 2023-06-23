@@ -53,7 +53,7 @@ public class CaseListener implements Listener {
 
     Player player = event.getPlayer();
     final TagResolver playerResolver = MiniPlaceholders.getAudiencePlaceholders(player);
-    player.sendMessage(miniMessage().deserialize("Player Name: <test-expansion>", playerResolver));
+    // player.sendMessage(miniMessage().deserialize("Player Name: <test-expansion>", playerResolver));
   }
 
   @EventHandler
