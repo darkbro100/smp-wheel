@@ -3,6 +3,9 @@ package me.paul.foliastuff.listeners;
 import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
+import me.paul.foliastuff.CaseStats;
+import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.SettingsManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -14,6 +17,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +39,21 @@ public class CaseListener implements Listener {
 
       event.getDrops().add(head);
     }
+  }
+
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    FoliaStuff.getInstance().getLogger().info("Loading case stats for: " + event.getPlayer().getName());
+    CaseStats stats = SettingsManager.getInstance().load(event.getPlayer().getUniqueId());
+    CaseStats.store(event.getPlayer().getUniqueId(), stats);
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    FoliaStuff.getInstance().getLogger().info("Saving case stats for: " + event.getPlayer().getName());
+    CaseStats stats = CaseStats.get(event.getPlayer().getUniqueId());
+    SettingsManager.getInstance().save(stats);
+    CaseStats.clear(event.getPlayer().getUniqueId());
   }
 
 //  @EventHandler
@@ -80,7 +100,7 @@ public class CaseListener implements Listener {
 
       // don't let the case double spin
       if (caseIns.isRunning()) {
-        if(caseIns.spinner().equals(player.getUniqueId())) {
+        if (caseIns.spinner().equals(player.getUniqueId())) {
           caseIns.quickOpen();
         } else {
           player.sendMessage(Component.text("Case is already spinning!", NamedTextColor.RED));
@@ -113,6 +133,10 @@ public class CaseListener implements Listener {
             .color(caseItem.getRarity().getColor()))
           .append(Component.text(" item!")
             .color(TextColor.color(255, 255, 255))));
+
+        CaseStats stats = CaseStats.get(player.getUniqueId());
+        stats.addCaseOpen(caseItem.getRarity());
+        SettingsManager.getInstance().save(stats);
       });
 
       Bukkit.broadcast(player.displayName()

@@ -5,6 +5,7 @@ import com.github.johnnyjayjay.spigotmaps.rendering.ImageRenderer;
 import com.google.common.collect.Lists;
 import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
+import me.paul.foliastuff.CaseStats;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.wheel.Wheel;
 import org.bukkit.Location;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class SettingsManager implements MapStorage {
@@ -30,8 +32,8 @@ public class SettingsManager implements MapStorage {
   private SettingsManager() {
   }
 
-  private File wheelFile;
-  private YamlConfiguration wheelConfig;
+  private File wheelFile, dataFile;
+  private YamlConfiguration wheelConfig, dataConfig;
 
   public static SettingsManager getInstance() {
     return instance;
@@ -53,6 +55,40 @@ public class SettingsManager implements MapStorage {
 
     wheelConfig = YamlConfiguration.loadConfiguration(wheelFile);
 
+    dataFile = new File(FoliaStuff.getInstance().getDataFolder(), "data.yml");
+    if (!dataFile.exists()) {
+      try {
+        dataFile.createNewFile();
+      } catch (IOException e) {
+        System.err.println("Could not create data.yml!");
+        e.printStackTrace();
+      }
+    }
+
+    dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+  }
+
+  public CaseStats load(UUID player) {
+    if (!dataConfig.contains(player.toString()))
+      return new CaseStats(player);
+
+    CaseStats stats = new CaseStats(player);
+    for(CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values())
+      stats.setCaseOpens(rarity, dataConfig.getInt(player + "." + rarity.name().toLowerCase()));
+
+    return stats;
+  }
+
+  public void save(CaseStats stats) {
+    for(CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values())
+      dataConfig.set(stats.getUuid() + "." + rarity.name().toLowerCase(), stats.getCaseOpens(rarity));
+
+    try {
+      dataConfig.save(dataFile);
+    } catch (IOException e) {
+      System.err.println("Could not save data.yml!");
+      e.printStackTrace();
+    }
   }
 
   public YamlConfiguration getWheelConfig() {
