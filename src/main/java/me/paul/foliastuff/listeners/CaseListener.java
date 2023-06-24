@@ -1,34 +1,33 @@
 package me.paul.foliastuff.listeners;
 
 import com.mojang.datafixers.util.Pair;
-import io.github.miniplaceholders.api.MiniPlaceholders;
 import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.CaseStats;
 import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.SettingsManager;
+import me.paul.foliastuff.util.scheduler.Sync;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-
-import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public class CaseListener implements Listener {
 
@@ -45,13 +44,25 @@ public class CaseListener implements Listener {
     }
   }
 
+  @EventHandler
+  public void onSpawnerPlace(BlockPlaceEvent event) {
+    if (event.getBlockPlaced().getType() == Material.SPAWNER && event.getPlayer().getInventory().getItemInMainHand().getType() == Material.SPAWNER) {
+      BlockStateMeta bsm = (BlockStateMeta) event.getPlayer().getInventory().getItemInMainHand().getItemMeta();
+      CreatureSpawner itemSpawner = (CreatureSpawner) bsm.getBlockState();
+
+      CreatureSpawner blockSpawner = (CreatureSpawner) event.getBlockPlaced().getState();
+      blockSpawner.setSpawnedType(itemSpawner.getSpawnedType());
+      blockSpawner.update();
+    }
+  }
+
 
   //TODO: undo this if we ever move to some type of DB solution (prolly sqlite)
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
     FoliaStuff.getInstance().getLogger().info("Loading case stats for: " + event.getPlayer().getName());
     CaseStats stats = CaseStats.get(event.getPlayer().getUniqueId());
-    if(stats == null) {
+    if (stats == null) {
       stats = SettingsManager.getInstance().load(event.getPlayer().getUniqueId());
       CaseStats.store(event.getPlayer().getUniqueId(), stats);
     }
@@ -66,7 +77,7 @@ public class CaseListener implements Listener {
 //  }
 
 //  @EventHandler
-//  public void onJoin(PlayerJoinEvent event) {
+//  public void onItemGiveJoin(PlayerJoinEvent event) {
 //    Sync.get(event.getPlayer()).delay(20).run(() -> {
 //      for (CaseItem caseItem : Case.getCases()[0].getItems()) {
 //        if (caseItem.getRarity() == CaseItem.CaseRarity.BLUE)
@@ -75,18 +86,17 @@ public class CaseListener implements Listener {
 //        if (caseItem.getRarity() == CaseItem.CaseRarity.PURPLE)
 //          continue;
 //
-//        if(caseItem.getRarity() == CaseItem.CaseRarity.ANCIENT)
+//        if (caseItem.getRarity() == CaseItem.CaseRarity.ANCIENT)
 //          continue;
 //
-//        if(caseItem.getRarity() == CaseItem.CaseRarity.GOLD)
+//        if (caseItem.getRarity() == CaseItem.CaseRarity.RED)
 //          continue;
 //
-//        ItemStack drop = caseItem.generateItem();
-//        while (drop.getType() != Material.ENCHANTED_BOOK && drop.getType() != Material.PLAYER_HEAD) {
-//          drop = caseItem.generateItem();
-//        }
+//        if (caseItem.getRarity() == CaseItem.CaseRarity.PINK)
+//          continue;
 //
-//        event.getPlayer().getInventory().addItem(drop);
+//        for (ItemStack drop : caseItem.drops())
+//          event.getPlayer().getInventory().addItem(drop);
 //      }
 //    });
 //  }
