@@ -2,6 +2,7 @@ package me.paul.foliastuff;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.Util;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -45,6 +46,10 @@ public class CaseItem {
     return drops.toArray(new ItemStack[0]);
   }
 
+  public void removeDrop(ItemStack item) {
+    FoliaStuff.getInstance().getLogger().info("Attempted to remove item from CaseItem pool: " + drops.remove(item));
+  }
+
   public ItemStack generateItem() {
     List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
     Player player = Util.getRandomEntry(players);
@@ -75,7 +80,7 @@ public class CaseItem {
     return Objects.hash(rarity, drops);
   }
 
-  @Getter
+    @Getter
   public enum CaseRarity {
     BLUE(79_894, TextColor.color(0, 0, 125), Material.BLUE_WOOL),
     PURPLE(15_980, TextColor.color(125, 0, 125), Material.PURPLE_WOOL),

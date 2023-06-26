@@ -1,72 +1,107 @@
 package me.paul.foliastuff.cmd;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
+import me.paul.foliastuff.other.FoliaStuff;
 import me.paul.foliastuff.util.ItemBuilder;
 import me.paul.foliastuff.util.Util;
+import me.paul.foliastuff.util.gui.GuiButton;
+import me.paul.foliastuff.util.gui.GuiPage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class TestCaseCommand implements CommandExecutor {
+public class CaseCommand implements CommandExecutor, TabExecutor {
 
   @Override
-  public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+  public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
     if (!(commandSender instanceof Player player))
       return false;
 
-    Case caseInst = Case.get(0);
-    if (caseInst == null)
-      caseInst = createBasicCase();
+    if (args.length == 0 || !args[0].equalsIgnoreCase("edit")) {
+      createBasicCase().location(player.getLocation().getBlock().getLocation().clone().add(0.1, 0, 0.5));
+      player.sendMessage(Component.text("Created new case"));
+      return true;
+    }
 
-    if (caseInst.location() == null)
-      caseInst.location(player.getLocation().getBlock().getLocation().clone().add(0.1, 0, 0.5));
+    if (args.length > 1 && args[0].equalsIgnoreCase("edit")) {
+      try {
+        Integer id = Integer.parseInt(args[1]);
+        Case caseInst = Case.get(id);
+        if (caseInst == null) {
+          player.sendMessage(Component.text("Invalid case id"));
+          return true;
+        }
 
-    CompletableFuture<Pair<CaseItem, ItemStack>> future = new CompletableFuture<>();
-    caseInst.spin(player, future);
-    future.whenComplete((pair, ex) -> {
-      if (ex != null) {
-        ex.printStackTrace();
-        return;
+        GuiPage page = new GuiPage(FoliaStuff.getInstance(), 6, "Editing Case #" + id);
+        for (CaseItem caseItem : caseInst.getItems()) {
+          GuiButton button = new GuiButton(ItemBuilder.of(caseItem.getRarity().getBlockType()).name(Component.text("View " + caseItem.getRarity().name() + " Items")).build());
+          button.setListener((e, p) -> onCaseItemButtonClick(e, p, caseItem));
+
+          page.addButton(button);
+        }
+
+        page.show(player);
+      } catch (Exception e) {
+        player.sendMessage(Component.text("Invalid case id"));
+        return true;
       }
-
-      ItemStack it = pair.getSecond();
-      CaseItem caseItem = pair.getFirst();
-
-      @NotNull HashMap<Integer, ItemStack> map = player.getInventory().addItem(it);
-      if (!map.isEmpty())
-        map.values().forEach(it2 -> player.getWorld().dropItemNaturally(player.getLocation(), it2));
-
-      Bukkit.broadcast(player.displayName()
-        .append(Component.text(" got a ")
-          .color(TextColor.color(255, 255, 255)))
-        .append(Component.text(caseItem.getRarity().name())
-          .color(caseItem.getRarity().getColor()))
-        .append(Component.text(" item!")
-          .color(TextColor.color(255, 255, 255))));
-    });
-
-    player.sendMessage(Component.text("Spinning case..."));
+    }
 
     return false;
+  }
+
+  private void onCaseItemButtonClick(InventoryClickEvent e_, Player player, CaseItem caseItem) {
+    GuiPage page = new GuiPage(FoliaStuff.getInstance(), 6, "Editing - " + caseItem.getRarity().name());
+
+    page.setMainClickListener((e) -> {
+      e.setCancelled(true);
+
+      if (e.getClickedInventory() != null && e.isLeftClick() && e.getView().getBottomInventory().equals(e.getClickedInventory()) && e.getCurrentItem() != null) {
+        ItemStack clicked = e.getCurrentItem();
+        caseItem.add(clicked.clone());
+
+        // reopen the gui
+        onCaseItemButtonClick(e, player, caseItem);
+      }
+    });
+
+    for (ItemStack item : caseItem.drops()) {
+      GuiButton button = new GuiButton(ItemBuilder.of(item.clone()).setLore(ChatColor.GRAY + "Right click to remove").build());
+      button.setListener((e, p) -> {
+        e.setCancelled(true);
+
+        if (e.isRightClick())
+          caseItem.removeDrop(item);
+
+        // reopen the gui
+        onCaseItemButtonClick(e, p, caseItem);
+      });
+
+      page.addButton(button);
+    }
+
+    page.show(player);
   }
 
   private Case createBasicCase() {
@@ -94,8 +129,8 @@ public class TestCaseCommand implements CommandExecutor {
     pinks.add(new ItemStack(Material.FIREWORK_ROCKET, 64));
 
     List<ItemStack> reds = Lists.newArrayList();
-    reds.add(new ItemStack(Material.ANCIENT_DEBRIS, 1));
-    reds.add(new ItemStack(Material.ENCHANTED_GOLDEN_APPLE));
+    reds.add(new ItemStack(Material.ANCIENT_DEBRIS, 3));
+    reds.add(new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 10));
     reds.add(new ItemStack(Material.BEACON));
 
     ItemStack meatStack = ItemBuilder.of(Material.PORKCHOP)
@@ -109,7 +144,6 @@ public class TestCaseCommand implements CommandExecutor {
     List<ItemStack> gold = Lists.newArrayList();
     ItemStack godTrident = ItemBuilder.of(Material.TRIDENT)
       .addUnsafeEnchantment(Enchantment.LOYALTY, 3)
-      .addUnsafeEnchantment(Enchantment.RIPTIDE, 3)
       .addUnsafeEnchantment(Enchantment.CHANNELING, 1)
       .addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 5)
       .addUnsafeEnchantment(Enchantment.IMPALING, 5)
@@ -188,5 +222,15 @@ public class TestCaseCommand implements CommandExecutor {
       new CaseItem(CaseItem.CaseRarity.RED).add(reds),
       new CaseItem(CaseItem.CaseRarity.GOLD).add(gold),
       new CaseItem(CaseItem.CaseRarity.ANCIENT).add(ancient));
+  }
+
+  @Override
+  public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+    if(args.length == 1)
+      return List.of("edit");
+    if(args.length == 2)
+      return IntStream.range(0, Case.getCases().length).mapToObj(Integer::toString).collect(Collectors.toList());
+
+    return List.of();
   }
 }

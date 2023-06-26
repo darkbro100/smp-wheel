@@ -10,11 +10,13 @@ import me.paul.foliastuff.listeners.CaseListener;
 import me.paul.foliastuff.listeners.WheelListener;
 import me.paul.foliastuff.util.SettingsManager;
 import me.paul.foliastuff.util.Util;
+import me.paul.foliastuff.util.gui.listener.GuiListener;
 import me.paul.foliastuff.wheel.WheelEffectManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,7 +48,10 @@ public final class FoliaStuff extends JavaPlugin {
     getCommand("wheeleffect").setExecutor(new WheelEffectCommand());
     getCommand("displayname").setExecutor(new DisplayNameCommand());
     getCommand("gif").setExecutor(new DisplayImageCommand());
-    getCommand("case").setExecutor(new TestCaseCommand());
+
+    CaseCommand cmd = new CaseCommand();
+    getCommand("case").setExecutor(cmd);
+    getCommand("case").setTabCompleter(cmd);
 
     registerListeners();
 
@@ -74,6 +79,7 @@ public final class FoliaStuff extends JavaPlugin {
     pm.registerEvents(new WheelListener(), this);
     pm.registerEvents(new CaseListener(), this);
     pm.registerEvents(new TreeFellerListener(), this);
+    pm.registerEvents(new GuiListener(), this);
   }
 
   public void registerExpansion() {
