@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
 import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.WeightedRandomizer;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
@@ -17,6 +18,7 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftVillager;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +40,8 @@ public class Case {
 
   protected UUID spinner;
 
+  private Util.Direction direction;
+
   private TextDisplay displayEnt;
   private ArmorStand interactEnt;
 
@@ -52,32 +56,6 @@ public class Case {
       this.items.add(ci, ci.getRarity().weight);
 
     cases.put(this.id, this);
-
-    // debug code to test the odds, ensure they are similar to CSGO
-//    FoliaStuff.getInstance().getLogger().info("TESTING SOMETHING IN 1 SECOND");
-//    Bukkit.getGlobalRegionScheduler().runDelayed(FoliaStuff.getInstance(), task -> {
-//      FoliaStuff.getInstance().getLogger().info("TESTING SOMETHING NOW");
-//
-//      for(int j = 0; j < 10; j++) {
-//        int ancientCount = 0, goldCount = 0;
-//        for(int i = 0; i < 20_000; i++) {
-//          CaseItem item = generateItem();
-//            if(item.getRarity() == CaseItem.CaseRarity.GOLD) {
-//            goldCount++;
-//          } else if(item.getRarity() == CaseItem.CaseRarity.ANCIENT) {
-//                        System.out.println("Found ancient item after " + i + " tries");
-//              ancientCount++;
-//            }
-//        }
-//
-//        double d = (double) ancientCount / 20_000;
-//        System.out.println("Ancient chance: " + (d * 100) + "%");
-//        d = (double) goldCount / 20_000;
-//        System.out.println("Gold chance: " + (d * 100) + "%");
-//
-//      }
-//
-//    }, 20);
   }
 
   public static Case[] getCases() {
@@ -110,6 +88,14 @@ public class Case {
     return this;
   }
 
+  public Case position(Block signBlock) {
+    this.location = signBlock.getLocation().clone().add(0.5, 0, 0.5);
+    this.direction = Util.getDirFromSign(signBlock);
+    Sync.get(location).delay(20).run(this::spawnDisplay);
+
+    return this;
+  }
+
   /**
    * Location of this case (cloned)
    *
@@ -120,6 +106,14 @@ public class Case {
       return null;
 
     return location.clone();
+  }
+
+  public Util.Direction getDirection() {
+    return direction;
+  }
+
+  public void setDirection(Util.Direction direction) {
+    this.direction = direction;
   }
 
   protected CaseItem generateItem() {
@@ -181,8 +175,7 @@ public class Case {
     }
 
     // define spawn loc
-    Location spawnLoc = location.clone().add(-1, 1, -1.5);
-    spawnLoc = spawnLoc.getBlock().getLocation().clone().add(0.5, 0, 0.5);
+    Location spawnLoc = location().add(direction.getVector().multiply(-1.5)).add(0, 1.5, 0);
 
     // delete nearby text displays that may have not been deleted somehow
     spawnLoc.getWorld().getNearbyEntities(spawnLoc, 2, 2, 2, e -> e instanceof TextDisplay || e instanceof ArmorStand).forEach(Entity::remove);
@@ -190,7 +183,6 @@ public class Case {
     displayEnt = spawnLoc.getWorld().spawn(spawnLoc, TextDisplay.class);
     displayEnt.setBillboard(Display.Billboard.CENTER);
     displayEnt.text(Component.text("Right Click to Spin!").color(TextColor.color(0x965613)));
-
 
     interactEnt = spawnLoc.getWorld().spawn(spawnLoc.clone().subtract(0, 1.65, 0), ArmorStand.class);
     interactEnt.setInvisible(true);
@@ -206,12 +198,9 @@ public class Case {
       // cancel the task
       holder.cancel();
 
-      // reset speed
-      CaseRunnable.resetSpeed();
-
       // black wool floor
       for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
-        Location loc = location.clone().add(i - 0.2, -1, 0);
+        Location loc = location().add(i - 0.2, -1, 0);
         loc.getBlock().setType(Material.BLACK_WOOL);
       }
 

@@ -12,6 +12,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,15 +41,33 @@ public class CaseCommand implements CommandExecutor, TabExecutor {
     if (!(commandSender instanceof Player player))
       return false;
 
+    if(!player.isOp()) {
+      player.sendMessage(Component.text("fuck you"));
+      return false;
+    }
+
     if (args.length == 0 || !args[0].equalsIgnoreCase("edit")) {
-      createBasicCase().location(player.getLocation().getBlock().getLocation().clone().add(0.1, 0, 0.5));
+
+      Block block = player.getTargetBlockExact(50);
+      if(block == null || block.isEmpty()) {
+        player.sendMessage(Component.text("look at sign pls"));
+        return false;
+      }
+
+      Optional<BlockFace> optional = Util.getRotation(block);
+      if(optional.isEmpty()) {
+        player.sendMessage(Component.text("look at block with rotation pls"));
+        return false;
+      }
+
+      createBasicCase().position(block);
       player.sendMessage(Component.text("Created new case"));
       return true;
     }
 
     if (args.length > 1 && args[0].equalsIgnoreCase("edit")) {
       try {
-        Integer id = Integer.parseInt(args[1]);
+        int id = Integer.parseInt(args[1]);
         Case caseInst = Case.get(id);
         if (caseInst == null) {
           player.sendMessage(Component.text("Invalid case id"));
@@ -226,6 +247,8 @@ public class CaseCommand implements CommandExecutor, TabExecutor {
 
   @Override
   public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+    if(!commandSender.isOp())
+      return List.of();
     if(args.length == 1)
       return List.of("edit");
     if(args.length == 2)

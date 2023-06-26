@@ -3,10 +3,20 @@ package me.paul.foliastuff.util;
 import com.google.common.collect.Lists;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.entity.Entity;
+import org.bukkit.material.Rails;
+import org.bukkit.material.SimpleAttachableMaterialData;
+import org.bukkit.material.Tree;
+import org.bukkit.util.Vector;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -112,7 +122,7 @@ public class Util {
    * @return number of blocks changed
    */
   public static List<Block> makeCylinder(Location pos, double radiusX, double radiusZ, boolean filled) {
-    if(pos.getWorld() == null)
+    if (pos.getWorld() == null)
       return Lists.newArrayList();
 
     List<Block> affected = Lists.newArrayList();
@@ -197,5 +207,135 @@ public class Util {
   public static String format(float i) {
     return FORMAT.format(i);
   }
+
+  /**
+   * Get direction that the sign is facing
+   *
+   * @param s Sign
+   * @return Direction that sign is facing
+   */
+  public static Direction getDirFromSign(Sign s) {
+    Optional<BlockFace> face = Util.getRotation(s.getBlock());
+    return Direction.get(Util.getYaw(face.get()));
+  }
+
+  /**
+   * Get direction that the sign is facing
+   *
+   * @param s Sign
+   * @return Direction that sign is facing
+   */
+  public static Direction getDirFromSign(Block block) {
+    Optional<BlockFace> face = Util.getRotation(block);
+    return Direction.get(Util.getYaw(face.get()));
+  }
+
+  public static Optional<BlockFace> getRotation(Block block) {
+    BlockData data = block.getBlockData();
+
+    if (data instanceof Rotatable)
+      return Optional.of(((Rotatable) data).getRotation());
+
+    if (data instanceof Directional)
+      return Optional.of(((Directional) data).getFacing());
+
+    if (data instanceof SimpleAttachableMaterialData)
+      return Optional.of(((SimpleAttachableMaterialData) data).getFacing());
+
+    if (data instanceof Tree)
+      return Optional.of(((Tree) data).getDirection());
+
+    if (data instanceof Rails)
+      return Optional.of(((Rails) data).getDirection());
+
+    return Optional.empty();
+  }
+
+  public static float getYaw(BlockFace face) {
+    return 1f * faceToYaw(face) + 90;
+  }
+
+  private static int faceToYaw(final BlockFace face) {
+    return wrapAngle(45 * faceToNotch(face));
+  }
+
+
+  private static final EnumMap<BlockFace, Integer> notches = new EnumMap<>(BlockFace.class);
+  public static final BlockFace[] RADIAL = {
+    BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH,
+    BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST
+  };
+
+  static {
+    for (int i = 0; i < RADIAL.length; i++) {
+      notches.put(RADIAL[i], i);
+    }
+  }
+
+  private static int faceToNotch(BlockFace face) {
+    Integer notch = notches.get(face);
+    return notch == null ? 0 : notch.intValue();
+  }
+
+  private static int wrapAngle(int angle) {
+    int wrappedAngle = angle;
+    while (wrappedAngle <= -180) {
+      wrappedAngle += 360;
+    }
+    while (wrappedAngle > 180) {
+      wrappedAngle -= 360;
+    }
+    return wrappedAngle;
+  }
+
+  public enum Direction {
+    NORTH("North", "N", 0),
+    NORTH_EAST("North East", "NE", 45),
+    EAST("East", "E", 90),
+    SOUTH_EAST("South East",
+      "SE", 135),
+    SOUTH("South", "S", 180), SOUTH_WEST("South West", "SW",
+      224),
+    WEST("West", "W", 270),
+    NORTH_WEST("North West", "NW", 315);
+
+    Direction(String name, String acronym, int degrees) {
+      Validate.notNull(name);
+      Validate.notNull(acronym);
+      Validate.isTrue(degrees >= 0 && degrees <= 360);
+
+      this.name = name;
+      this.acronym = acronym;
+      this.degrees = degrees;
+    }
+
+    public Vector getVector() {
+      return switch (this) {
+        case NORTH -> BlockFace.NORTH.getDirection();
+        case NORTH_EAST -> BlockFace.NORTH_EAST.getDirection();
+        case EAST -> BlockFace.EAST.getDirection();
+        case SOUTH_EAST -> BlockFace.SOUTH_EAST.getDirection();
+        case SOUTH -> BlockFace.SOUTH.getDirection();
+        case SOUTH_WEST -> BlockFace.SOUTH_WEST.getDirection();
+        case WEST -> BlockFace.WEST.getDirection();
+        case NORTH_WEST -> BlockFace.NORTH_WEST.getDirection();
+      };
+    }
+
+    public static Direction get(float yaw) {
+      return VALUES[(int) ((yaw >= 0.0F ? yaw + 22.4999F : yaw - 22.5F) / 45.0F) & 0x7];
+    }
+
+    public float getYaw() {
+      return degrees;
+    }
+
+    public final String name;
+    public final String acronym;
+    public final int degrees;
+    private static final Direction[] VALUES = {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST,
+      NORTH_WEST};
+  }
+
 
 }

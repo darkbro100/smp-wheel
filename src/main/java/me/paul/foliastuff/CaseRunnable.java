@@ -41,14 +41,16 @@ public class CaseRunnable implements Runnable {
   private final Location maxLeft;
   private boolean shouldAdd = false;
 
-  private static final Vector SPEED = new Vector(-0.5, 0, 0);
+  private Vector speed;
 
   protected CaseItem winningItem;
   protected final ItemStack winningItemStack;
-  private static final int WINNING_TICKET = 109;
+  private static final int WINNING_TICKET = 106;
   private Item winningItemInstance;
 
   protected CompletableFuture<Pair<CaseItem, ItemStack>> future;
+
+  private Vector direction;
 
   public CaseRunnable(TaskHolder holder, Case caseInst, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
     this.future = future;
@@ -59,14 +61,25 @@ public class CaseRunnable implements Runnable {
     this.winningItem = caseInst.generateItem();
     this.winningItemStack = winningItem.generateItem().clone();
 
-    double maxOffset = -((double) MAX_ITEMS / 2);
-    this.maxLeft = caseInst.location().clone().add(-0.1, 0, 0).add(maxOffset - 0.1, 0, 0);
+    Util.Direction dir = Util.Direction.get(caseInst.getDirection().getYaw() + 90);
+    this.direction = dir.getVector().multiply(-1);
+    this.speed = new Vector(direction.getX() * 0.5, direction.getY() * 0.5, direction.getZ() * 0.5);
 
-    for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++)
+    double maxOffset = ((double) MAX_ITEMS / 2);
+    this.maxLeft = caseInst.location().clone().add(direction.clone().multiply(maxOffset)).subtract(direction.clone().multiply(0.25));
+
+    for (int i = -(MAX_ITEMS / 2); i <= ((MAX_ITEMS)) / 2; i++)
       this.itemCycle.add(drop(caseInst.generateItem(true), i, false));
+
+    FoliaStuff.getInstance().getLogger().info("center: " + caseInst.location());
+    FoliaStuff.getInstance().getLogger().info("direction: " + dir);
+    FoliaStuff.getInstance().getLogger().info("speed: " + speed);
+    FoliaStuff.getInstance().getLogger().info("maxLeft: " + maxLeft);
+
+    itemCycle.forEach(it -> FoliaStuff.getInstance().getLogger().info("item: " + it.getLocation()));
   }
 
-  private static final double END_DEC = -0.02;
+  private static final double END_DEC = -0.01;
 
   @Override
   public void run() {
@@ -77,13 +90,15 @@ public class CaseRunnable implements Runnable {
       if (endTicks == 0)
         endDelay = Util.random(40, 60);
 
-      if (SPEED.getX() < END_DEC && endTicks != 0 && endTicks % 5 == 0)
-        SPEED.add(new Vector(-END_DEC, 0, 0));
+      if (speed.length() > Math.abs(END_DEC) && endTicks != 0 && endTicks % 2 == 0) {
+        speed.add(direction.clone().multiply(END_DEC));
+        FoliaStuff.getInstance().getLogger().info("speed: " + speed);
+      }
 
       // once the end state has ended
       if (endTicks >= endDelay) {
         holder.cancel();
-        SPEED.setX(-0.5);
+        resetSpeed();
 
         // clear other items
         for (Item it : itemCycle) {
@@ -131,14 +146,16 @@ public class CaseRunnable implements Runnable {
       // keep shifting items over (slowly)
       for (int i = itemCycle.size() - 1; i >= 0; i--) {
         Item item = itemCycle.get(i);
-        item.setVelocity(SPEED);
+        item.setVelocity(speed);
         checkItem(item);
         updateBlock(item, true);
       }
 
       // set speed to 0 if the winning item is gonna leave
-      if (winningItemInstance.getLocation().getX() < (caseInst.location().getX() - 0.75))
-        SPEED.multiply(0);
+      if (checkIsWithinCenter(winningItemInstance)) {
+        speed.multiply(0);
+        FoliaStuff.getInstance().getLogger().info("speed = 0");
+      }
 
       // add new item in case
       addNewItem();
@@ -149,12 +166,12 @@ public class CaseRunnable implements Runnable {
     }
 
     if (ticks != 0 && ticks % 40 == 0)
-      SPEED.multiply(0.5);
+      speed.multiply(0.5);
 
     // Shift every item over to the left
     for (int i = itemCycle.size() - 1; i >= 0; i--) {
       Item item = itemCycle.get(i);
-      item.setVelocity(SPEED);
+      item.setVelocity(speed);
       // mark for removal
       checkItem(item);
       updateBlock(item, false);
@@ -166,10 +183,8 @@ public class CaseRunnable implements Runnable {
     ticks++;
   }
 
-  public static void resetSpeed() {
-    SPEED.setX(-0.5);
-    SPEED.setY(0);
-    SPEED.setZ(0);
+  private void resetSpeed() {
+    this.speed = new Vector(direction.getX() * 0.5, direction.getY() * 0.5, direction.getZ() * 0.5);
   }
 
   private void updateBlock(Item item, boolean particle) {
@@ -188,7 +203,8 @@ public class CaseRunnable implements Runnable {
       // need to arbitarily insert the pre-chosen item into the list
       // so it appears in the middle
       boolean winner = ticks == WINNING_TICKET;
-      Item it = drop(winner ? winningItem : caseInst.generateItem(true), MAX_ITEMS / 2, winner);
+      FoliaStuff.getInstance().getLogger().info("new item tick: " + ticks + " winner: " + WINNING_TICKET);
+      Item it = drop(winner ? winningItem : caseInst.generateItem(true), -((MAX_ITEMS / 2)), winner);
       if (winner)
         winningItemInstance = it;
 
@@ -199,17 +215,45 @@ public class CaseRunnable implements Runnable {
       shouldAdd = false;
     }
   }
+  
+  private boolean checkIsWithinCenter(Item item) {
+    Location itemLoc = item.getLocation();
+    Location center = caseInst.location();
+    
+    if(direction.getX() < 0 && itemLoc.getX() <= center.getX() - 0.3) {
+      return true;
+    } else if(direction.getX() > 0 && itemLoc.getX() >= center.getX() + 0.3) {
+      return true;
+    } else if(direction.getZ() < 0 && itemLoc.getZ() <= center.getZ() - 0.3) {
+      return true;
+    } else return direction.getZ() > 0 && itemLoc.getZ() >= center.getZ() + 0.3;
+  }
 
   private void checkItem(Item item) {
+    boolean shouldRemove = false;
     // mark for removal
-    if (item.getLocation().getX() < maxLeft.getX()) {
+    if(direction.getX() < 0 && item.getLocation().getX() <= maxLeft.getX()) {
+      System.out.println("should remove 1");
+      shouldRemove = true;
+    } else if(direction.getX() > 0 && item.getLocation().getX() >= maxLeft.getX()) {
+      System.out.println("should remove 2");
+      shouldRemove = true;
+    } else if(direction.getZ() < 0 && item.getLocation().getZ() <= maxLeft.getZ()) {
+      System.out.println("should remove 3");
+      shouldRemove = true;
+    } else if(direction.getZ() > 0 && item.getLocation().getZ() >= maxLeft.getZ()) {
+      System.out.println("should remove 4");
+      shouldRemove = true;
+    }
+
+    if(shouldRemove) {
       item.remove();
       itemCycle.remove(item);
       shouldAdd = true;
     }
   }
 
-  private Item drop(CaseItem item, int offset, boolean winner) {
+  private Item drop(CaseItem item, double offset, boolean winner) {
     ItemStack it = winner ? winningItemStack.clone() : item.generateItem().clone();
     it.setAmount(1);
 
@@ -217,10 +261,12 @@ public class CaseRunnable implements Runnable {
     meta.displayName(Component.text(UUID.randomUUID().toString()));
     it.setItemMeta(meta);
 
-    Location spawnLoc = caseInst.location().clone().add(offset == 2 ? 1.9 : offset, 0.0, 0);
+
+//    Location spawnLoc = caseInst.location().clone().add(offset == 2 ? 1.9 : offset, 0.0, 0);
+    Location spawnLoc = caseInst.location().add(direction.clone().multiply(offset == 2 ? 1.9 : offset)).subtract(direction.clone().multiply(0.4));
 
     return caseInst.location().getWorld().dropItem(spawnLoc, it, d -> {
-      d.setVelocity(SPEED);
+      d.setVelocity(speed);
       d.setGravity(false);
       d.setCanPlayerPickup(false);
       d.setCanMobPickup(false);
