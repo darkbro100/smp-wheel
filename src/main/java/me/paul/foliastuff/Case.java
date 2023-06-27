@@ -83,14 +83,21 @@ public class Case {
    */
   public Case location(Location loc) {
     this.location = loc;
-    Sync.get(location).delay(20).run(this::spawnDisplay);
-
     return this;
   }
 
   public Case position(Block signBlock) {
     this.location = signBlock.getLocation().clone().add(0.5, 0, 0.5);
     this.direction = Util.getDirFromSign(signBlock);
+    Sync.get(location).delay(20).run(this::spawnDisplay);
+    Sync.get(signBlock.getLocation()).run(() -> signBlock.setType(Material.AIR));
+
+    return this;
+  }
+
+  public Case position(Location location, Util.Direction direction) {
+    this.location = location.clone();
+    this.direction = direction;
     Sync.get(location).delay(20).run(this::spawnDisplay);
 
     return this;
@@ -110,10 +117,6 @@ public class Case {
 
   public Util.Direction getDirection() {
     return direction;
-  }
-
-  public void setDirection(Util.Direction direction) {
-    this.direction = direction;
   }
 
   protected CaseItem generateItem() {
@@ -146,7 +149,6 @@ public class Case {
   public void spin(Player spinner, CompletableFuture<Pair<CaseItem, ItemStack>> future) {
     this.spinner = spinner.getUniqueId();
 
-    FoliaStuff.getInstance().getLogger().info("opening case");
     this.holder = new TaskHolder();
     this.runnable = new CaseRunnable(holder, this, future);
     this.running.set(true);
@@ -194,13 +196,12 @@ public class Case {
 
   public void quickOpen() {
     if (!holder.isCancelled()) {
-      FoliaStuff.getInstance().getLogger().info("quick opening case");
       // cancel the task
       holder.cancel();
 
-      // black wool floor
+      // update floor
       for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
-        Location loc = location().add(i - 0.2, -1, 0);
+        Location loc = location().add(direction.getVector().clone().multiply(i - 0.2)).subtract(0, 1, 0);
         loc.getBlock().setType(Material.BLACK_WOOL);
       }
 
