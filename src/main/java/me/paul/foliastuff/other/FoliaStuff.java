@@ -7,16 +7,19 @@ import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.CaseStats;
 import me.paul.foliastuff.cmd.*;
 import me.paul.foliastuff.listeners.CaseListener;
+import me.paul.foliastuff.listeners.TreeFellerListener;
 import me.paul.foliastuff.listeners.WheelListener;
+import me.paul.foliastuff.util.NMS;
 import me.paul.foliastuff.util.SettingsManager;
 import me.paul.foliastuff.util.Util;
+import me.paul.foliastuff.util.entity.CustomPanda;
 import me.paul.foliastuff.util.gui.listener.GuiListener;
+import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.wheel.WheelEffectManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,16 +41,20 @@ public final class FoliaStuff extends JavaPlugin {
     startTime = System.currentTimeMillis() / 1000L;
     instance = this;
 
-    SettingsManager.getInstance().setup();
-    SettingsManager.getInstance().loadCases();
-    SettingsManager.getInstance().loadWheels();
-    SettingsManager.getInstance().loadMapRenders();
-    SettingsManager.getInstance().loadAllCaseStats();
+    // Init nms stuff
+    String ver = Util.getMinecraftRevision();
+    try {
+      NMS.init(ver);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      Bukkit.shutdown();
+    }
 
     getCommand("wheel").setExecutor(new WheelCommand());
     getCommand("wheeleffect").setExecutor(new WheelEffectCommand());
     getCommand("displayname").setExecutor(new DisplayNameCommand());
     getCommand("gif").setExecutor(new DisplayImageCommand());
+    getCommand("test").setExecutor(new TestCommand());
 
     CaseCommand cmd = new CaseCommand();
     getCommand("case").setExecutor(cmd);
@@ -65,6 +72,26 @@ public final class FoliaStuff extends JavaPlugin {
     InitializationListener.register(SettingsManager.getInstance(), this);
 
     registerExpansion();
+
+    // pls work
+    NMS.registerEntityClass(CustomPanda.class);
+
+    // delay settings stuff to make sure all plugins are loaded
+    if (TaskBuilder.isFoliaSupported()) {
+      Bukkit.getGlobalRegionScheduler().runDelayed(this, task -> {
+        initStorageStuff();
+      }, 40);
+    } else {
+      Bukkit.getScheduler().runTaskLater(this, this::initStorageStuff, 40);
+    }
+  }
+
+  private void initStorageStuff() {
+    SettingsManager.getInstance().setup();
+    SettingsManager.getInstance().loadCases();
+    SettingsManager.getInstance().loadWheels();
+    SettingsManager.getInstance().loadMapRenders();
+    SettingsManager.getInstance().loadAllCaseStats();
   }
 
   @Override
@@ -101,20 +128,20 @@ public final class FoliaStuff extends JavaPlugin {
       })
       .globalPlaceholder("total_opens", (ctx, queue) -> {
         int total = 0;
-        for(CaseStats stats : CaseStats.getAll())
+        for (CaseStats stats : CaseStats.getAll())
           total += stats.totalOpens();
 
         return Tag.selfClosingInserting(Component.text(Util.format(total)));
       })
       .globalPlaceholder("server_total_emeralds_spent", (ctx, queue) -> {
         int total = 0;
-        for(CaseStats stats : CaseStats.getAll())
+        for (CaseStats stats : CaseStats.getAll())
           total += (stats.totalOpens() * 3);
 
         return Tag.selfClosingInserting(Component.text(Util.format(total)));
       });
 
-    for(CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values()) {
+    for (CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values()) {
       expansionBuilder.audiencePlaceholder(rarity.name().toLowerCase() + "_total_opens", (audience, ctx, queue) -> {
         final Player player = (Player) audience;
         CaseStats stats = CaseStats.get(player.getUniqueId());
@@ -122,7 +149,7 @@ public final class FoliaStuff extends JavaPlugin {
       });
       expansionBuilder.globalPlaceholder("total_" + rarity.name().toLowerCase() + "_opens", (ctx, queue) -> {
         int total = 0;
-        for(CaseStats stats : CaseStats.getAll())
+        for (CaseStats stats : CaseStats.getAll())
           total += stats.getCaseOpens(rarity);
 
         return Tag.selfClosingInserting(Component.text(Util.format(total)));
@@ -136,7 +163,7 @@ public final class FoliaStuff extends JavaPlugin {
       });
       expansionBuilder.globalPlaceholder("total_" + rarity.name().toLowerCase() + "_percentage", (ctx, queue) -> {
         double total = 0;
-        for(CaseStats caseStats : CaseStats.getAll()) {
+        for (CaseStats caseStats : CaseStats.getAll()) {
           total += caseStats.getChance(rarity);
         }
         DecimalFormat df = new DecimalFormat("##.##");

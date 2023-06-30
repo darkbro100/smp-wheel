@@ -1,5 +1,6 @@
-package me.paul.foliastuff.other;
+package me.paul.foliastuff.listeners;
 
+import me.paul.foliastuff.other.FoliaStuff;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,9 +27,6 @@ public class TreeFellerListener implements Listener {
   static {
     LOG_MATERIALS = Stream.of(Material.values()).filter(m -> m.name().contains("_LOG")).toArray(Material[]::new);
     LEAF_MATERIALS = Stream.of(Material.values()).filter(m -> m.name().contains("_LEAVES")).toArray(Material[]::new);
-
-    FoliaStuff.getInstance().getLogger().info(Arrays.toString(LOG_MATERIALS));
-    FoliaStuff.getInstance().getLogger().info(Arrays.toString(LEAF_MATERIALS));
   }
 
   @EventHandler

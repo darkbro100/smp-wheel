@@ -5,6 +5,7 @@ import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -22,6 +23,14 @@ import java.text.NumberFormat;
 import java.util.*;
 
 public class Util {
+
+  private static String MINECRAFT_REVISION;
+  public static String getMinecraftRevision() {
+    if (MINECRAFT_REVISION == null) {
+      MINECRAFT_REVISION = Bukkit.getServer().getClass().getPackage().getName();
+    }
+    return MINECRAFT_REVISION.substring(MINECRAFT_REVISION.lastIndexOf('.') + 2);
+  }
 
   public static final SplittableRandom RANDOM = new SplittableRandom();
 

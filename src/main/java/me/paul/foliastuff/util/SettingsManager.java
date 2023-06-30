@@ -120,7 +120,6 @@ public class SettingsManager implements MapStorage {
         continue;
 
       YamlConfiguration config = YamlConfiguration.loadConfiguration(f);
-      List<CaseItem> items = new ArrayList<>();
 
       Location center = LocUtil.locFromString(config.getString("location"));
       Util.Direction direction = Util.Direction.valueOf(config.getString("direction"));
@@ -133,15 +132,16 @@ public class SettingsManager implements MapStorage {
 
         for (String itemKey : config.getConfigurationSection(path + ".drops").getKeys(false)) {
           ItemStack stack = config.getItemStack(path + ".drops." + itemKey);
-          FoliaStuff.getInstance().getLogger().info("Loaded " + stack + " for rarity " + rarity.name());
+//          FoliaStuff.getInstance().getLogger().info("Loaded " + stack + " for rarity " + rarity.name());
           caseItem.add(stack);
         }
 
         caseInstance.add(caseItem);
-        FoliaStuff.getInstance().getLogger().info("Loaded caseitem " + rarity.name());
+//        FoliaStuff.getInstance().getLogger().info("Loaded caseitem " + rarity.name());
       }
 
       caseInstance.position(center, direction);
+      FoliaStuff.getInstance().getLogger().info("Loaded case " + caseInstance.getId() + " @ " + center + " with " + caseInstance.getItems().length + " items");
     }
   }
 

@@ -70,6 +70,9 @@ tasks {
     filesMatching("plugin.yml") {
       expand(props)
     }
+    filesMatching("paper-plugin.yml") {
+      expand(props)
+    }
   }
 
   shadowJar {

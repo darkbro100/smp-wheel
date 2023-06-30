@@ -1,13 +1,14 @@
-name: $name
-version: $version
-main: me.paul.foliastuff.other.FoliaStuff
-description: $description
+name: FoliaStuff
+version: '1.1'
+main: 'me.paul.foliastuff.other.FoliaStuff'
+description: Wheel, Cases, Goated on the Sticks
 folia-supported: true
+load: STARTUP
+api-version: '1.20'
+bootstrapper: me.paul.foliastuff.other.FoliaBootstrapper
 
-load: POSTWORLD
 authors:
   - paulyg
-api-version: $apiVersion
 
 commands:
   home:
@@ -30,4 +31,7 @@ commands:
     op: true
   case:
     description: open a case smiley
+    op: true
+  test:
+    description: Test cmd
     op: true
