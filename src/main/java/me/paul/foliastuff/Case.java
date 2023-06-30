@@ -180,7 +180,12 @@ public class Case {
     Location spawnLoc = location().add(direction.getVector().multiply(-1.5)).add(0, 1.5, 0);
 
     // delete nearby text displays that may have not been deleted somehow
-    spawnLoc.getWorld().getNearbyEntities(spawnLoc, 2, 2, 2, e -> e instanceof TextDisplay || e instanceof ArmorStand).forEach(Entity::remove);
+    spawnLoc.getWorld().getNearbyEntities(spawnLoc, 2, 2, 2).forEach(ent -> {
+      if(ent.getType() == EntityType.ARMOR_STAND || ent.getType() == EntityType.TEXT_DISPLAY) {
+        System.out.println("found nearby entity: " + ent.getType());
+        ent.remove();
+      }
+    });
 
     displayEnt = spawnLoc.getWorld().spawn(spawnLoc, TextDisplay.class);
     displayEnt.setBillboard(Display.Billboard.CENTER);
@@ -194,16 +199,20 @@ public class Case {
     interactEnt.setMetadata("caseId", new FixedMetadataValue(FoliaStuff.getInstance(), id));
   }
 
+  public void resetFloor(Vector direction) {
+    for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
+      Location loc = location().add(direction.clone().multiply(i - 0.2)).subtract(0, 1, 0);
+      loc.getBlock().setType(Material.BLACK_WOOL);
+    }
+  }
+
   public void quickOpen() {
     if (!holder.isCancelled()) {
       // cancel the task
       holder.cancel();
 
       // update floor
-      for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
-        Location loc = location().add(direction.getVector().clone().multiply(i - 0.2)).subtract(0, 1, 0);
-        loc.getBlock().setType(Material.BLACK_WOOL);
-      }
+      resetFloor(Util.Direction.get(direction.getYaw() + 90).getVector().multiply(-1));
 
       // delete all the items
       runnable.itemCycle.forEach(item -> Sync.get(item).run(item::remove));

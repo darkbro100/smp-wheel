@@ -126,10 +126,7 @@ public class CaseRunnable implements Runnable {
           future.complete(Pair.of(winningItem, winningItemStack));
 
           // update floor
-          for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
-            Location loc = caseInst.location().add(direction.clone().multiply(i - 0.2)).subtract(0, 1, 0);
-            loc.getBlock().setType(Material.BLACK_WOOL);
-          }
+          caseInst.resetFloor(direction);
         }
 
         caseInst.running.set(false);

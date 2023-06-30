@@ -7,6 +7,7 @@ import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.CaseStats;
 import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.wheel.Wheel;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -176,6 +177,12 @@ public class SettingsManager implements MapStorage {
       } catch (IOException e) {
         e.printStackTrace();
       }
+
+      // attempt to delete previous ents
+      if(c.interactEntity() != null)
+        c.interactEntity().remove();
+      if(c.displayEntity() != null)
+        c.displayEntity().remove();
     }
   }
 

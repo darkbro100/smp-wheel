@@ -77,6 +77,8 @@ public final class FoliaStuff extends JavaPlugin {
     NMS.registerEntityClass(CustomPanda.class);
 
     // delay settings stuff to make sure all plugins are loaded
+    SettingsManager.getInstance().setup();
+
     if (TaskBuilder.isFoliaSupported()) {
       Bukkit.getGlobalRegionScheduler().runDelayed(this, task -> {
         initStorageStuff();
@@ -87,7 +89,6 @@ public final class FoliaStuff extends JavaPlugin {
   }
 
   private void initStorageStuff() {
-    SettingsManager.getInstance().setup();
     SettingsManager.getInstance().loadCases();
     SettingsManager.getInstance().loadWheels();
     SettingsManager.getInstance().loadMapRenders();

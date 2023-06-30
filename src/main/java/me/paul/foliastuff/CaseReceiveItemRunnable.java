@@ -3,6 +3,7 @@ package me.paul.foliastuff;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.mojang.datafixers.util.Pair;
 import me.paul.foliastuff.util.Duration;
+import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -62,10 +63,7 @@ public class CaseReceiveItemRunnable implements Runnable {
       future.complete(new Pair<>(caseItem, stack));
 
       // update floor
-      for (int i = -(MAX_ITEMS / 2); i <= MAX_ITEMS / 2; i++) {
-        Location loc = caseInst.location().add(i - 0.2, -1, 0);
-        loc.getBlock().setType(Material.BLACK_WOOL);
-      }
+      caseInst.resetFloor(Util.Direction.get(caseInst.getDirection().getYaw() + 90).getVector().multiply(-1));
     }
 
     item.getWorld().playSound(item.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, pitch);
