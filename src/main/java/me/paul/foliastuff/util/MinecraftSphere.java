@@ -35,7 +35,7 @@ public class MinecraftSphere {
 
 	public Set<Location> getFaces(int faces) {
 		Set<Location> locations = new HashSet<>();
-		double inc = 360 / faces;
+		double inc = 360d / faces;
 		Location calcLoc = new Location(center.getWorld(), 0, 0, 0);
 		for (float y = 0; y < 360; y += inc)
 			for (float p = 0; p < 360; p += inc) {

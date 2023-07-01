@@ -110,6 +110,10 @@ public class CaseItem {
 
       return null;
     }
+
+    public boolean isSuperRare() {
+      return this == RED || this == GOLD || this == ANCIENT;
+    }
   }
 
 }

@@ -109,17 +109,17 @@ public class CaseListener implements Listener {
 
   @EventHandler
   public void onInteract(PlayerInteractEvent event) {
-    if(event.getClickedBlock() == null)
+    if (event.getClickedBlock() == null)
       return;
-    if(event.getClickedBlock().isEmpty())
+    if (event.getClickedBlock().isEmpty())
       return;
-    if(event.getAction() != Action.RIGHT_CLICK_BLOCK)
+    if (event.getAction() != Action.RIGHT_CLICK_BLOCK)
       return;
-    if(event.getItem() == null)
+    if (event.getItem() == null)
       return;
-    if(event.getItem().getType() != Material.PANDA_SPAWN_EGG)
+    if (event.getItem().getType() != Material.PANDA_SPAWN_EGG)
       return;
-    if(!ItemUtil.getName(event.getItem()).contains("THE GOAT"))
+    if (!ItemUtil.getName(event.getItem()).contains("THE GOAT"))
       return;
 
     event.setCancelled(true);
@@ -189,22 +189,32 @@ public class CaseListener implements Listener {
         if (!map.isEmpty())
           map.values().forEach(it2 -> player.getWorld().dropItemNaturally(player.getLocation(), it2));
 
-        Bukkit.broadcast(player.displayName()
+
+        Component msg = player.displayName()
           .append(Component.text(" got a ")
             .color(TextColor.color(255, 255, 255)))
           .append(Component.text(caseItem.getRarity().name())
             .color(caseItem.getRarity().getColor()))
           .append(Component.text(" item!")
-            .color(TextColor.color(255, 255, 255))));
+            .color(TextColor.color(255, 255, 255)));
+
+        if (caseItem.getRarity().isSuperRare()) {
+          Bukkit.broadcast(msg);
+        } else {
+          player.getWorld().getNearbyPlayers(player.getLocation(), RADIUS).forEach(p -> p.sendMessage(msg));
+        }
 
         CaseStats stats = CaseStats.get(player.getUniqueId());
         stats.addCaseOpen(caseItem.getRarity());
         SettingsManager.getInstance().save(stats);
       });
 
-      Bukkit.broadcast(player.displayName()
+      // send msg nearby
+      player.getWorld().getNearbyPlayers(player.getLocation(), RADIUS).forEach(p -> p.sendMessage(player.displayName()
         .append(Component.text(" is going for the gold!"))
-        .append(Component.text(" GOLD GOLD GOLD!", NamedTextColor.GOLD)));
+        .append(Component.text(" GOLD GOLD GOLD!", NamedTextColor.GOLD))));
     }
   }
+
+  private static final double RADIUS = 50.0D;
 }
