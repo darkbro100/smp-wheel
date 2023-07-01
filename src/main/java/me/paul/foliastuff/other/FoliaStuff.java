@@ -78,6 +78,7 @@ public final class FoliaStuff extends JavaPlugin {
 
     // delay settings stuff to make sure all plugins are loaded
     SettingsManager.getInstance().setup();
+    SettingsManager.getInstance().loadMapRenders();
 
     if (TaskBuilder.isFoliaSupported()) {
       Bukkit.getGlobalRegionScheduler().runDelayed(this, task -> {
@@ -91,7 +92,6 @@ public final class FoliaStuff extends JavaPlugin {
   private void initStorageStuff() {
     SettingsManager.getInstance().loadCases();
     SettingsManager.getInstance().loadWheels();
-    SettingsManager.getInstance().loadMapRenders();
     SettingsManager.getInstance().loadAllCaseStats();
   }
 

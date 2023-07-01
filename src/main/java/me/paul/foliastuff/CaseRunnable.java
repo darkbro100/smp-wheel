@@ -46,9 +46,8 @@ public class CaseRunnable implements Runnable {
 
   protected CaseItem winningItem;
   protected final ItemStack winningItemStack;
-  private static final int WINNING_TICKET = 106;
+  private static final int WINNING_TICKET = 102;
   private Item winningItemInstance;
-
   protected CompletableFuture<Pair<CaseItem, ItemStack>> future;
 
   private Vector direction;
@@ -198,6 +197,7 @@ public class CaseRunnable implements Runnable {
     if (shouldAdd) {
       // need to arbitarily insert the pre-chosen item into the list
       // so it appears in the middle
+//      System.out.println("spawning @ " + ticks + " winner: " + WINNING_TICKET);
       boolean winner = ticks == WINNING_TICKET;
       Item it = drop(winner ? winningItem : caseInst.generateItem(true), -((MAX_ITEMS / 2)), winner);
       if (winner)

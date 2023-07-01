@@ -178,11 +178,11 @@ public class SettingsManager implements MapStorage {
         e.printStackTrace();
       }
 
-      // attempt to delete previous ents
-      if(c.interactEntity() != null)
-        c.interactEntity().remove();
-      if(c.displayEntity() != null)
-        c.displayEntity().remove();
+//      // attempt to delete previous ents
+//      if(c.interactEntity() != null)
+//        c.interactEntity().remove();
+//      if(c.displayEntity() != null)
+//        c.displayEntity().remove();
     }
   }
 
