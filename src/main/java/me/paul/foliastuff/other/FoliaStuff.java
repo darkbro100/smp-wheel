@@ -163,12 +163,16 @@ public final class FoliaStuff extends JavaPlugin {
         return Tag.selfClosingInserting(Component.text(df.format(stats.getChance(rarity) * 100)));
       });
       expansionBuilder.globalPlaceholder("total_" + rarity.name().toLowerCase() + "_percentage", (ctx, queue) -> {
+        double totalRarityOpens = 0;
         double total = 0;
         for (CaseStats caseStats : CaseStats.getAll()) {
-          total += caseStats.getChance(rarity);
+          total += caseStats.totalOpens();
+          totalRarityOpens += caseStats.getCaseOpens(rarity);
         }
+        double chance = totalRarityOpens / total;
+
         DecimalFormat df = new DecimalFormat("##.##");
-        return Tag.selfClosingInserting(Component.text(df.format(total * 100)));
+        return Tag.selfClosingInserting(Component.text(df.format(chance * 100)));
       });
     }
 
