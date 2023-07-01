@@ -5,7 +5,10 @@ import me.paul.foliastuff.Case;
 import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.CaseStats;
 import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.ItemUtil;
+import me.paul.foliastuff.util.NMS;
 import me.paul.foliastuff.util.SettingsManager;
+import me.paul.foliastuff.util.entity.CustomPanda;
 import me.paul.foliastuff.util.scheduler.Sync;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,15 +20,18 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -100,6 +106,44 @@ public class CaseListener implements Listener {
 //      }
 //    });
 //  }
+
+  @EventHandler
+  public void onInteract(PlayerInteractEvent event) {
+    if(event.getClickedBlock() == null)
+      return;
+    if(event.getClickedBlock().isEmpty())
+      return;
+    if(event.getAction() != Action.RIGHT_CLICK_BLOCK)
+      return;
+    if(event.getItem() == null)
+      return;
+    if(event.getItem().getType() != Material.PANDA_SPAWN_EGG)
+      return;
+    if(!ItemUtil.getName(event.getItem()).contains("THE GOAT"))
+      return;
+
+    event.setCancelled(true);
+    event.getItem().subtract();
+
+    Player player = event.getPlayer();
+
+    try {
+      CustomPanda cp = (CustomPanda) NMS.createEntity(CustomPanda.class, player.getLocation());
+      cp.setOwner(player.getUniqueId());
+
+      // wanna make the text gold/grayish color
+      Component customName = Component.text("THE GOAT PANDA").color(TextColor.color(0xFFD700));
+      cp.setCustomName(io.papermc.paper.adventure.PaperAdventure.asVanilla(customName));
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(e);
+    } catch (InstantiationException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @EventHandler
   public void onInteract(PlayerInteractAtEntityEvent event) {

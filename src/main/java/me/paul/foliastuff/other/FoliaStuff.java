@@ -74,7 +74,7 @@ public final class FoliaStuff extends JavaPlugin {
     registerExpansion();
 
     // pls work
-    NMS.registerEntityClass(CustomPanda.class);
+    NMS.registerEntityClass(CustomPanda.class, CustomPanda.createAttributes(), "custom_panda");
 
     // delay settings stuff to make sure all plugins are loaded
     SettingsManager.getInstance().setup();

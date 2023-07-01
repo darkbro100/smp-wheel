@@ -185,20 +185,20 @@ public class NMS {
     }
   }
 
-  public static void registerEntityClass(Class<?> clazz) {
+  public static void registerEntityClass(Class<?> clazz, AttributeSupplier.Builder attributes, String nameKey) {
     if (ENTITY_REGISTRY == null)
       return;
     Class<?> search = clazz;
     while ((search = search.getSuperclass()) != null && Entity.class.isAssignableFrom(search)) {
 
       net.minecraft.world.entity.EntityType<?> type = ENTITY_REGISTRY.findType(search);
-      ResourceLocation key = new ResourceLocation("minecraft", "custom_panda");
-      EntityType oType = EntityType.Builder.of(CustomPanda::new, MobCategory.MISC).build("custom_panda");
+      ResourceLocation key = new ResourceLocation("minecraft", nameKey);
+      EntityType oType = EntityType.Builder.of(CustomPanda::new, MobCategory.MISC).build(nameKey);
 
       if (type == null)
         continue;
 
-      final Map<EntityType<? extends LivingEntity>, AttributeSupplier> suppliers = ImmutableMap.<EntityType<? extends LivingEntity>, AttributeSupplier>builder().putAll(getSupplierMap()).put(oType, Panda.createAttributes().build()).build();
+      final Map<EntityType<? extends LivingEntity>, AttributeSupplier> suppliers = ImmutableMap.<EntityType<? extends LivingEntity>, AttributeSupplier>builder().putAll(getSupplierMap()).put(oType, attributes.build()).build();
       try {
         ATTRIBUTE_MAP_SETTER = getFinalSetter(DefaultAttributes.class, "b");
         ATTRIBUTE_MAP_SETTER.invoke(suppliers);

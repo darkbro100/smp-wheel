@@ -1,47 +1,61 @@
 package me.paul.foliastuff.util.entity;
 
-import com.mojang.serialization.Lifecycle;
-import io.netty.util.DefaultAttributeMap;
-import net.minecraft.core.WritableRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
+import io.papermc.paper.threadedregions.EntityScheduler;
+import me.paul.foliastuff.util.entity.goal.FollowOwnerGoal;
+import me.paul.foliastuff.util.entity.goal.OwnerHurtByTargetGoal;
+import me.paul.foliastuff.util.entity.goal.OwnerHurtTargetGoal;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.TemptGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Panda;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
-public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJumping {
+public class CustomPanda extends Panda implements CustomEntity, PlayerRideableJumping {
 
   @javax.annotation.Nullable
   private UUID owner;
 
+  static final Predicate<ItemEntity> PANDA_ITEMS = (entityitem) -> {
+    ItemStack itemstack = entityitem.getItem();
+
+    return (itemstack.is(Blocks.BAMBOO.asItem()) || itemstack.is(Blocks.CAKE.asItem())) && entityitem.isAlive() && !entityitem.hasPickUpDelay();
+  };
+
+  private PandaLookAtPlayerGoal lookAtPlayerGoal;
+
   public CustomPanda(EntityType<? extends Panda> type, Level world) {
     super(type, world);
-//    setPos(location.getX(), location.getY(), location.getZ());
+
     setMaxUpStep(1.0f);
   }
 
@@ -55,22 +69,18 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
   @Override
   protected void registerGoals() {
     this.goalSelector.addGoal(0, new FloatGoal(this));
-//    this.goalSelector.addGoal(2, new Panda.PandaPanicGoal(this, 2.0D));
-//    this.goalSelector.addGoal(2, new Panda.PandaBreedGoal(this, 1.0D));
-//    this.goalSelector.addGoal(3, new Panda.PandaAttackGoal(this, 1.2000000476837158D, true));
+    this.goalSelector.addGoal(3, new PandaAttackGoal(this, 1.2000000476837158D, true));
     this.goalSelector.addGoal(4, new TemptGoal(this, 1.0D, Ingredient.of(Blocks.BAMBOO.asItem()), false));
-//    this.goalSelector.addGoal(6, new Panda.PandaAvoidGoal<>(this, Player.class, 8.0F, 2.0D, 2.0D));
-//    this.goalSelector.addGoal(6, new Panda.PandaAvoidGoal<>(this, Monster.class, 4.0F, 2.0D, 2.0D));
-//    this.goalSelector.addGoal(7, new Panda.PandaSitGoal());
-//    this.goalSelector.addGoal(8, new Panda.PandaLieOnBackGoal(this));
-//    this.goalSelector.addGoal(8, new Panda.PandaSneezeGoal(this));
-//    this.lookAtPlayerGoal = new Panda.PandaLookAtPlayerGoal(this, Player.class, 6.0F);
-//    this.goalSelector.addGoal(9, this.lookAtPlayerGoal);
+    this.goalSelector.addGoal(7, new CustomPanda.PandaSitGoal());
+    this.goalSelector.addGoal(8, new CustomPanda.PandaLieOnBackGoal(this));
+    this.goalSelector.addGoal(8, new CustomPanda.PandaSneezeGoal(this));
+    this.lookAtPlayerGoal = new CustomPanda.PandaLookAtPlayerGoal(this, Player.class, 6.0F);
+    this.goalSelector.addGoal(9, this.lookAtPlayerGoal);
     this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
-//    this.goalSelector.addGoal(12, new Panda.PandaRollGoal(this));
-//    this.goalSelector.addGoal(13, new FollowParentGoal(this, 1.25D));
-    this.goalSelector.addGoal(14, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-//    this.targetSelector.addGoal(1, (new Panda.PandaHurtByTargetGoal(this, new Class[0])).setAlertOthers(new Class[0]));
+    this.goalSelector.addGoal(12, new CustomPanda.PandaRollGoal(this));
+    this.goalSelector.addGoal(13, new FollowOwnerGoal(this, 1.25D, 4, 32, false));
+    this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
+    this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
   }
 
   @Nullable
@@ -84,19 +94,94 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
   }
 
   @Override
+  public List<Entity> passengers() {
+    return this.getPassengers();
+  }
+
+  @Override
+  public boolean canPerformAction() {
+    if (passengers().isEmpty())
+      return super.canPerformAction();
+
+    return false;
+  }
+
+  @Override
+  public EntityScheduler getScheduler() {
+    return getBukkitEntity().taskScheduler;
+  }
+
+  public static AttributeSupplier.Builder createAttributes() {
+    return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 100.0D).add(Attributes.MOVEMENT_SPEED, 0.27000000596046448D).add(Attributes.ATTACK_DAMAGE, 12.0D);
+  }
+
+  @Override
+  public boolean asyncTP(ServerLevel destination, Vec3 pos, Float yaw, Float pitch, Vec3 speedDirectionUpdate, PlayerTeleportEvent.TeleportCause cause, long teleportFlags, Consumer<Entity> teleportComplete) {
+    // nosuchmethoderror for god knows what reason, so we use the api method which ultimately just calls the nms method anyways?!?!?!?
+    //    return ((Entity)this).teleportAsync(((ServerLevel) destination), pos, yaw, pitch, speedDirectionUpdate, cause, teleportFlags, teleportComplete);
+    getBukkitEntity().teleportAsync(new Location(destination.getWorld(), pos.x, pos.y, pos.z, yaw, pitch), cause);
+    return true;
+  }
+
+  @Override
+  public void readAdditionalSaveData(CompoundTag nbt) {
+    super.readAdditionalSaveData(nbt);
+
+    UUID uuid;
+
+    if (nbt.hasUUID("Owner")) {
+      uuid = nbt.getUUID("Owner");
+    } else {
+      String s = nbt.getString("Owner");
+
+      uuid = OldUsersConverter.convertMobOwnerIfNecessary(this.getServer(), s);
+    }
+
+    if (uuid != null) {
+      this.setOwner(uuid);
+    }
+  }
+
+  @Override
+  public void addAdditionalSaveData(CompoundTag nbt) {
+    super.addAdditionalSaveData(nbt);
+
+    if (this.getOwnerUUID() != null) {
+      nbt.putUUID("Owner", this.getOwnerUUID());
+    }
+  }
+
+  @Override
   public InteractionResult mobInteract(Player player, InteractionHand hand) {
-    if (!this.isVehicle() && !this.isBaby()) {
+    if(isOwner(player) && player.isShiftKeyDown()) {
+      this.sit(true);
+      return InteractionResult.sidedSuccess(this.level().isClientSide);
+    }
+
+    if (isOwner(player) && !this.isVehicle() && !this.isBaby()) {
       this.doPlayerRide(player);
       return InteractionResult.sidedSuccess(this.level().isClientSide);
+    } else if(!isOwner(player)) {
+      setTarget(player, EntityTargetEvent.TargetReason.TARGET_ATTACKED_OWNER, true);
+      return InteractionResult.FAIL;
     } else {
       return super.mobInteract(player, hand);
     }
   }
 
+  @Override
+  public boolean canFollow() {
+    if(!getPassengers().isEmpty())
+      return false;
+
+    return !isEating() && !isOnBack() && !isSitting();
+  }
+
   protected void doPlayerRide(Player player) {
-//    this.setEating(false);
-//    this.setStanding(false);
     if (!this.level().isClientSide) {
+      this.sit(false);
+      this.setOnBack(false);
+      this.eat(false);
       player.setYRot(this.getYRot());
       player.setXRot(this.getXRot());
       player.startRiding(this);
@@ -117,10 +202,10 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
 
   @Override
   public boolean isControlledByLocalInstance() {
-    if (getPassengers().isEmpty())
+    if (passengers().isEmpty())
       return super.isControlledByLocalInstance();
 
-    return getPassengers().get(0) instanceof Player;
+    return passengers().get(0) instanceof Player;
   }
 
   @Override
@@ -131,7 +216,7 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
     this.setRot(vec2f.y, vec2f.x);
     this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
 
-    if (!getPassengers().isEmpty()) {
+    if (!passengers().isEmpty()) {
       LivingEntity lent = getControllingPassenger();
       if (lent instanceof Player && lent.jumping && !isJumping) {
         isJumping = true;
@@ -144,7 +229,17 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
       }
       isJumping = false;
     }
+  }
 
+  @Override
+  protected void checkFallDamage(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) { }
+
+  private void trySit() {
+    if (!this.isInWater()) {
+      this.setZza(0.0F);
+      this.getNavigation().stop();
+      this.sit(true);
+    }
   }
 
   protected boolean isJumping;
@@ -251,6 +346,11 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
     System.out.println("stop jump");
   }
 
+  @Override
+  public Mob instance() {
+    return this;
+  }
+
   private static class BlankMoveControl extends MoveControl {
 
     private final CustomPanda panda;
@@ -262,8 +362,232 @@ public class CustomPanda extends Panda implements OwnableEntity, PlayerRideableJ
 
     @Override
     public void tick() {
-      if (panda.getPassengers().isEmpty())
+      if (panda.passengers().isEmpty())
         super.tick();
+    }
+  }
+
+  private static class PandaAttackGoal extends MeleeAttackGoal {
+
+    private final CustomPanda panda;
+
+    public PandaAttackGoal(CustomPanda panda, double speed, boolean pauseWhenMobIdle) {
+      super(panda, speed, pauseWhenMobIdle);
+      this.panda = panda;
+    }
+
+    @Override
+    public boolean canUse() {
+      return this.panda.canPerformAction() && super.canUse();
+    }
+  }
+
+  private class PandaSitGoal extends Goal {
+
+    private int cooldown;
+
+    public PandaSitGoal() {
+      this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+    }
+
+    @Override
+    public boolean canUse() {
+      if (this.cooldown <= CustomPanda.this.tickCount && !CustomPanda.this.isBaby() && !CustomPanda.this.isInWater() && CustomPanda.this.canPerformAction() && CustomPanda.this.getUnhappyCounter() <= 0) {
+        List<ItemEntity> list = CustomPanda.this.level().getEntitiesOfClass(ItemEntity.class, CustomPanda.this.getBoundingBox().inflate(6.0D, 6.0D, 6.0D), CustomPanda.PANDA_ITEMS);
+
+        return !list.isEmpty() || !CustomPanda.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty();
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+      return !CustomPanda.this.isInWater() && (CustomPanda.this.isLazy() || CustomPanda.this.random.nextInt(reducedTickDelay(600)) != 1) ? CustomPanda.this.random.nextInt(reducedTickDelay(2000)) != 1 : false;
+    }
+
+    @Override
+    public void tick() {
+      if (!CustomPanda.this.isSitting() && !CustomPanda.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
+        CustomPanda.this.trySit();
+      }
+
+    }
+
+    @Override
+    public void start() {
+      List<ItemEntity> list = CustomPanda.this.level().getEntitiesOfClass(ItemEntity.class, CustomPanda.this.getBoundingBox().inflate(8.0D, 8.0D, 8.0D), CustomPanda.PANDA_ITEMS);
+
+      if (!list.isEmpty() && CustomPanda.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
+        CustomPanda.this.getNavigation().moveTo((Entity) list.get(0), 1.2000000476837158D);
+      } else if (!CustomPanda.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
+        CustomPanda.this.trySit();
+      }
+
+      this.cooldown = 0;
+    }
+
+    @Override
+    public void stop() {
+      ItemStack itemstack = CustomPanda.this.getItemBySlot(EquipmentSlot.MAINHAND);
+
+      if (!itemstack.isEmpty()) {
+        CustomPanda.this.forceDrops = true; // Paper
+        CustomPanda.this.spawnAtLocation(itemstack);
+        CustomPanda.this.forceDrops = false; // Paper
+        CustomPanda.this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+        int i = CustomPanda.this.isLazy() ? CustomPanda.this.random.nextInt(50) + 10 : CustomPanda.this.random.nextInt(150) + 10;
+
+        this.cooldown = CustomPanda.this.tickCount + i * 20;
+      }
+
+      CustomPanda.this.sit(false);
+    }
+  }
+
+  private static class PandaLieOnBackGoal extends Goal {
+
+    private final CustomPanda panda;
+    private int cooldown;
+
+    public PandaLieOnBackGoal(CustomPanda panda) {
+      this.panda = panda;
+    }
+
+    @Override
+    public boolean canUse() {
+      return this.cooldown < this.panda.tickCount && this.panda.isLazy() && this.panda.canPerformAction() && this.panda.random.nextInt(reducedTickDelay(400)) == 1;
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+      return !this.panda.isInWater() && (this.panda.isLazy() || this.panda.random.nextInt(reducedTickDelay(600)) != 1) ? this.panda.random.nextInt(reducedTickDelay(2000)) != 1 : false;
+    }
+
+    @Override
+    public void start() {
+      this.panda.setOnBack(true);
+      this.cooldown = 0;
+    }
+
+    @Override
+    public void stop() {
+      this.panda.setOnBack(false);
+      this.cooldown = this.panda.tickCount + 200;
+    }
+  }
+
+  private static class PandaSneezeGoal extends Goal {
+
+    private final CustomPanda panda;
+
+    public PandaSneezeGoal(CustomPanda panda) {
+      this.panda = panda;
+    }
+
+    @Override
+    public boolean canUse() {
+      return this.panda.isBaby() && this.panda.canPerformAction() ? (this.panda.isWeak() && this.panda.random.nextInt(reducedTickDelay(500)) == 1 ? true : this.panda.random.nextInt(reducedTickDelay(6000)) == 1) : false;
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+      return false;
+    }
+
+    @Override
+    public void start() {
+      this.panda.sneeze(true);
+    }
+  }
+
+  private static class PandaLookAtPlayerGoal extends LookAtPlayerGoal {
+
+    private final Panda panda;
+
+    public PandaLookAtPlayerGoal(Panda panda, Class<? extends LivingEntity> targetType, float range) {
+      super(panda, targetType, range);
+      this.panda = panda;
+    }
+
+    public void setTarget(LivingEntity target) {
+      this.lookAt = target;
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+      return this.lookAt != null && super.canContinueToUse();
+    }
+
+    @Override
+    public boolean canUse() {
+      if (this.mob.getRandom().nextFloat() >= this.probability) {
+        return false;
+      } else {
+        if (this.lookAt == null) {
+          if (this.lookAtType == Player.class) {
+            this.lookAt = this.mob.level().getNearestPlayer(this.lookAtContext, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
+          } else {
+            this.lookAt = this.mob.level().getNearestEntity(this.mob.level().getEntitiesOfClass(this.lookAtType, this.mob.getBoundingBox().inflate((double) this.lookDistance, 3.0D, (double) this.lookDistance), (entityliving) -> {
+              return true;
+            }), this.lookAtContext, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
+          }
+        }
+
+        return this.panda.canPerformAction() && this.lookAt != null;
+      }
+    }
+
+    @Override
+    public void tick() {
+      if (this.lookAt != null) {
+        super.tick();
+      }
+
+    }
+  }
+
+  private static class PandaRollGoal extends Goal {
+
+    private final CustomPanda panda;
+
+    public PandaRollGoal(CustomPanda panda) {
+      this.panda = panda;
+      this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
+    }
+
+    @Override
+    public boolean canUse() {
+      if ((this.panda.isBaby() || this.panda.isPlayful()) && this.panda.onGround()) {
+        if (!this.panda.canPerformAction()) {
+          return false;
+        } else {
+          float f = this.panda.getYRot() * 0.017453292F;
+          float f1 = -Mth.sin(f);
+          float f2 = Mth.cos(f);
+          int i = (double) Math.abs(f1) > 0.5D ? Mth.sign((double) f1) : 0;
+          int j = (double) Math.abs(f2) > 0.5D ? Mth.sign((double) f2) : 0;
+
+          return this.panda.level().getBlockState(this.panda.blockPosition().offset(i, -1, j)).isAir() ? true : (this.panda.isPlayful() && this.panda.random.nextInt(reducedTickDelay(60)) == 1 ? true : this.panda.random.nextInt(reducedTickDelay(500)) == 1);
+        }
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+      return false;
+    }
+
+    @Override
+    public void start() {
+      this.panda.roll(true);
+    }
+
+    @Override
+    public boolean isInterruptable() {
+      return false;
     }
   }
 
