@@ -136,6 +136,10 @@ public class Case {
     return cases.get(id);
   }
 
+  public static void remove(Case caseIns) {
+    cases.remove(caseIns.id);
+  }
+
   public UUID spinner() {
     return spinner;
   }

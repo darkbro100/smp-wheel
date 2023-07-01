@@ -36,6 +36,11 @@ import java.util.stream.IntStream;
 
 public class CaseCommand implements CommandExecutor, TabExecutor {
 
+  private static final String[] COMMANDS = {"edit", "delete"};
+  private boolean isArg(String arg) {
+    return Arrays.stream(COMMANDS).anyMatch(arg::equalsIgnoreCase);
+  }
+
   @Override
   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
     if (!(commandSender instanceof Player player))
@@ -46,7 +51,7 @@ public class CaseCommand implements CommandExecutor, TabExecutor {
       return false;
     }
 
-    if (args.length == 0 || !args[0].equalsIgnoreCase("edit")) {
+    if (args.length == 0) {
 
       Block block = player.getTargetBlockExact(50);
       if(block == null || block.isEmpty()) {
@@ -83,6 +88,19 @@ public class CaseCommand implements CommandExecutor, TabExecutor {
         }
 
         page.show(player);
+      } catch (Exception e) {
+        player.sendMessage(Component.text("Invalid case id"));
+        return true;
+      }
+    } else if(args.length > 1 && args[0].equalsIgnoreCase("delete")) {
+      try {
+        int id = Integer.parseInt(args[1]);
+        Case caseInst = Case.get(id);
+        caseInst.displayEntity().remove();
+        caseInst.interactEntity().remove();
+        Case.remove(caseInst);
+
+        player.sendMessage(Component.text("Deleted case #" + id).color(TextColor.color(0xFF0000)));
       } catch (Exception e) {
         player.sendMessage(Component.text("Invalid case id"));
         return true;
@@ -250,7 +268,7 @@ public class CaseCommand implements CommandExecutor, TabExecutor {
     if(!commandSender.isOp())
       return List.of();
     if(args.length == 1)
-      return List.of("edit");
+      return List.of("edit", "delete");
     if(args.length == 2)
       return IntStream.range(0, Case.getCases().length).mapToObj(Integer::toString).collect(Collectors.toList());
 
