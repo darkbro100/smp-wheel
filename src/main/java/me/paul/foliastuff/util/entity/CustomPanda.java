@@ -72,7 +72,7 @@ public class CustomPanda extends Panda implements CustomEntity, PlayerRideableJu
     this.goalSelector.addGoal(3, new PandaAttackGoal(this, 1.2000000476837158D, true));
     this.goalSelector.addGoal(4, new TemptGoal(this, 1.0D, Ingredient.of(Blocks.BAMBOO.asItem()), false));
     this.goalSelector.addGoal(7, new CustomPanda.PandaSitGoal());
-    this.goalSelector.addGoal(8, new CustomPanda.PandaLieOnBackGoal(this));
+//    this.goalSelector.addGoal(8, new CustomPanda.PandaLieOnBackGoal(this));
     this.goalSelector.addGoal(8, new CustomPanda.PandaSneezeGoal(this));
     this.lookAtPlayerGoal = new CustomPanda.PandaLookAtPlayerGoal(this, Player.class, 6.0F);
     this.goalSelector.addGoal(9, this.lookAtPlayerGoal);
@@ -154,7 +154,7 @@ public class CustomPanda extends Panda implements CustomEntity, PlayerRideableJu
   @Override
   public InteractionResult mobInteract(Player player, InteractionHand hand) {
     if(isOwner(player) && player.isShiftKeyDown()) {
-      this.sit(true);
+      this.setOnBack(true);
       return InteractionResult.sidedSuccess(this.level().isClientSide);
     }
 
@@ -180,8 +180,8 @@ public class CustomPanda extends Panda implements CustomEntity, PlayerRideableJu
   protected void doPlayerRide(Player player) {
     if (!this.level().isClientSide) {
       this.sit(false);
-      this.setOnBack(false);
       this.eat(false);
+      this.setOnBack(false);
       player.setYRot(this.getYRot());
       player.setXRot(this.getXRot());
       player.startRiding(this);
