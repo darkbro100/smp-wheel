@@ -9,10 +9,8 @@ import me.paul.foliastuff.cmd.*;
 import me.paul.foliastuff.listeners.CaseListener;
 import me.paul.foliastuff.listeners.TreeFellerListener;
 import me.paul.foliastuff.listeners.WheelListener;
-import me.paul.foliastuff.util.NMS;
 import me.paul.foliastuff.util.SettingsManager;
 import me.paul.foliastuff.util.Util;
-import me.paul.foliastuff.util.entity.CustomPanda;
 import me.paul.foliastuff.util.gui.listener.GuiListener;
 import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.wheel.WheelEffectManager;
@@ -42,13 +40,13 @@ public final class FoliaStuff extends JavaPlugin {
     instance = this;
 
     // Init nms stuff
-    String ver = Util.getMinecraftRevision();
-    try {
-      NMS.init(ver);
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-      Bukkit.shutdown();
-    }
+//    String ver = Util.getMinecraftRevision();
+//    try {
+//      NMS.init(ver);
+//    } catch (ClassNotFoundException e) {
+//      e.printStackTrace();
+//      Bukkit.shutdown();
+//    }
 
     getCommand("wheel").setExecutor(new WheelCommand());
     getCommand("wheeleffect").setExecutor(new WheelEffectCommand());
@@ -74,7 +72,7 @@ public final class FoliaStuff extends JavaPlugin {
     registerExpansion();
 
     // pls work
-    NMS.registerEntityClass(CustomPanda.class, CustomPanda.createAttributes(), "custom_panda");
+//    NMS.registerEntityClass(CustomPanda.class, CustomPanda.createAttributes(), "custom_panda");
 
     // delay settings stuff to make sure all plugins are loaded
     SettingsManager.getInstance().setup();
