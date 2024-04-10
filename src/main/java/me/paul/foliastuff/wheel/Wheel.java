@@ -23,6 +23,8 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+import static me.paul.foliastuff.wheel.PassiveEffectGen.applyPassiveEffect;
+
 @Getter
 public class Wheel implements Runnable {
 
@@ -285,6 +287,8 @@ public class Wheel implements Runnable {
       // sound/fireworks
       celebrate();
 
+      // passive effect
+      applyPassiveEffect(player);
       return;
     }
 
