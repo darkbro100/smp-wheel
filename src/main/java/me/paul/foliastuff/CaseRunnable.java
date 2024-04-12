@@ -197,7 +197,8 @@ public class CaseRunnable implements Runnable {
     if (shouldAdd) {
       // need to arbitarily insert the pre-chosen item into the list
       // so it appears in the middle
-      System.out.println("spawning @ " + ticks + " winner: " + WINNING_TICKET);
+      // FUCK YOU STOP SPAMMING MY CONSOLE
+      // System.out.println("spawning @ " + ticks + " winner: " + WINNING_TICKET);
       boolean winner = ticks == WINNING_TICKET;
       Item it = drop(winner ? winningItem : caseInst.generateItem(true), -((MAX_ITEMS / 2)), winner);
       if (winner)
