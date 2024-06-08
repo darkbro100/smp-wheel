@@ -1,7 +1,10 @@
 package me.paul.foliastuff;
 
 import lombok.Getter;
+import lombok.Setter;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -15,8 +18,12 @@ public class CaseStats {
   @Getter
   private final UUID uuid;
 
+  @Getter @Setter
+  private Timestamp lastWheelSpin = null;
+
   public CaseStats(UUID player, boolean store) {
     this.uuid = player;
+    this.lastWheelSpin = Timestamp.from(Instant.now());
     this.caseOpens = new HashMap<>();
 
     for (CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values()) {

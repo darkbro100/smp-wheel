@@ -1,6 +1,6 @@
 plugins {
   `java-library`
-  id("io.papermc.paperweight.userdev") version "1.5.5"
+  id("io.papermc.paperweight.userdev") version "1.7.1"
   id("xyz.jpenilla.run-paper") version "2.1.0" // Adds runServer and runMojangMappedServer tasks for testing
 
   // Shades and relocates dependencies into our plugin jar. See https://imperceptiblethoughts.com/shadow/introduction/
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-   paperweight.foliaDevBundle("1.20.1-R0.1-SNAPSHOT")
+   paperweight.foliaDevBundle("1.20.4-R0.1-SNAPSHOT")
 
   implementation("org.reflections:reflections:0.10.2")
   implementation("com.github.johnnyjayjay:spigot-maps:2.1.2")

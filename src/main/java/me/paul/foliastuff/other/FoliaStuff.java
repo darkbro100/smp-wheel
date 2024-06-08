@@ -1,6 +1,7 @@
 package me.paul.foliastuff.other;
 
 import com.github.johnnyjayjay.spigotmaps.InitializationListener;
+import com.google.common.collect.Lists;
 import io.github.miniplaceholders.api.Expansion;
 import lombok.Getter;
 import me.paul.foliastuff.CaseItem;
@@ -9,9 +10,11 @@ import me.paul.foliastuff.cmd.*;
 import me.paul.foliastuff.listeners.CaseListener;
 import me.paul.foliastuff.listeners.TreeFellerListener;
 import me.paul.foliastuff.listeners.WheelListener;
+import me.paul.foliastuff.util.Duration;
 import me.paul.foliastuff.util.SettingsManager;
 import me.paul.foliastuff.util.Util;
 import me.paul.foliastuff.util.gui.listener.GuiListener;
+import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.wheel.WheelEffectManager;
 import net.kyori.adventure.text.Component;
@@ -19,12 +22,19 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
-public final class FoliaStuff extends JavaPlugin {
+public final class FoliaStuff extends JavaPlugin implements Listener {
 
   @Getter
   private long startTime;
@@ -85,6 +95,49 @@ public final class FoliaStuff extends JavaPlugin {
     } else {
       Bukkit.getScheduler().runTaskLater(this, this::initStorageStuff, 40);
     }
+
+    Sync.get().interval(1).delay(1).run(this::checkPlayers);
+  }
+
+  private static final Duration WHEEL_WAIT = Duration.minutes(0.5);
+
+  /**
+   * Check if players have not spun the wheel in a while (24 hours)
+   */
+  private void checkPlayers() {
+    Timestamp now = Timestamp.from(Instant.now());
+
+    for (Player player : Bukkit.getOnlinePlayers()) {
+      CaseStats stats = CaseStats.get(player.getUniqueId());
+
+      Timestamp last = stats.getLastWheelSpin();
+      if (last == null) continue;
+
+      long diff = now.getTime() - last.getTime();
+
+      if (diff >= WHEEL_WAIT.ms() && !alertedPlayers.contains(player.getUniqueId())) {
+        alertPlayer(player);
+      }
+    }
+  }
+
+  private final List<UUID> alertedPlayers = Lists.newArrayList();
+
+  public void alertPlayer(Player player) {
+    player.sendMessage("You have not spun the wheel in 24 hours! Spin it now!");
+
+    alertedPlayers.add(player.getUniqueId());
+  }
+
+  public void removeAlert(Player player) {
+    alertedPlayers.remove(player.getUniqueId());
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    alertedPlayers.remove(event.getPlayer().getUniqueId());
+    System.out.println("Removed - " + event.getPlayer().getName());
+    System.out.println("Size - " + alertedPlayers.size());
   }
 
   private void initStorageStuff() {
@@ -102,6 +155,7 @@ public final class FoliaStuff extends JavaPlugin {
 
   private void registerListeners() {
     PluginManager pm = Bukkit.getPluginManager();
+    pm.registerEvents(this, this);
     pm.registerEvents(new WheelListener(), this);
     pm.registerEvents(new CaseListener(), this);
     pm.registerEvents(new TreeFellerListener(), this);

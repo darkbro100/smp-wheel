@@ -19,6 +19,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +84,14 @@ public class SettingsManager implements MapStorage {
       return new CaseStats(player);
 
     CaseStats stats = new CaseStats(player);
+
+    String val = dataConfig.getString(player + ".lastWheelSpin");
+    if(val != null) {
+      Instant instant = Instant.parse(val);
+      Timestamp parsed = Timestamp.from(instant);
+      stats.setLastWheelSpin(parsed);
+    }
+
     for(CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values())
       stats.setCaseOpens(rarity, dataConfig.getInt(player + "." + rarity.name().toLowerCase()));
 
@@ -89,6 +99,8 @@ public class SettingsManager implements MapStorage {
   }
 
   public void save(CaseStats stats) {
+    dataConfig.set(stats.getUuid() + ".lastWheelSpin", stats.getLastWheelSpin().toInstant().toString());
+
     for(CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values())
       dataConfig.set(stats.getUuid() + "." + rarity.name().toLowerCase(), stats.getCaseOpens(rarity));
 

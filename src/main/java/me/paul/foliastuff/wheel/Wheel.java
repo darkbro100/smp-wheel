@@ -3,10 +3,9 @@ package me.paul.foliastuff.wheel;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
-import me.paul.foliastuff.util.Cooldown;
-import me.paul.foliastuff.util.Duration;
-import me.paul.foliastuff.util.LocUtil;
-import me.paul.foliastuff.util.Util;
+import me.paul.foliastuff.CaseStats;
+import me.paul.foliastuff.other.FoliaStuff;
+import me.paul.foliastuff.util.*;
 import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.util.scheduler.TaskHolder;
@@ -21,6 +20,8 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 
 import static me.paul.foliastuff.wheel.PassiveEffectGen.applyPassiveEffect;
@@ -129,6 +130,13 @@ public class Wheel implements Runnable {
       return false;
     if (started)
       return false;
+
+    // ensure this gets updated/saved
+    CaseStats stats = CaseStats.get(opener.getUniqueId());
+    stats.setLastWheelSpin(Timestamp.from(Instant.now()));
+    SettingsManager.getInstance().save(stats);
+
+    FoliaStuff.getInstance().removeAlert(opener);
 
     offset = lastAngle;
 
