@@ -68,13 +68,10 @@ public class PassiveEffectGen {
       diamonds.setAmount(2);
 
       for (int i = 1; i < 25; i++) {
-        p.getWorld().dropItemNaturally(loc, diamonds);
-        launchFirework(loc);
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
+        Sync.get().delay(i * 20).run(() -> {
+          launchFirework(loc);
+          p.getWorld().dropItemNaturally(loc, diamonds);
+        });
       }
     });
 
@@ -86,13 +83,10 @@ public class PassiveEffectGen {
       emerald.setAmount(2);
 
       for (int i = 1; i < 25; i++) {
-        p.getWorld().dropItemNaturally(loc, emerald);
-        launchFirework(loc);
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
+        Sync.get().delay(i * 20).run(() -> {
+          launchFirework(loc);
+          p.getWorld().dropItemNaturally(loc, emerald);
+        });
       }
     });
 
