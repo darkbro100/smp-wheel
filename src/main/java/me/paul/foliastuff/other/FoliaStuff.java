@@ -18,6 +18,7 @@ import me.paul.foliastuff.util.scheduler.Sync;
 import me.paul.foliastuff.util.scheduler.TaskBuilder;
 import me.paul.foliastuff.wheel.WheelEffectManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -27,6 +28,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -124,20 +127,27 @@ public final class FoliaStuff extends JavaPlugin implements Listener {
   private final List<UUID> alertedPlayers = Lists.newArrayList();
 
   public void alertPlayer(Player player) {
-    player.sendMessage("You have not spun the wheel in 24 hours! Spin it now!");
-
+    player.sendMessage("You're feeling the need to gamble! Where's the wheel?!!");
+    player.sendActionBar(
+      Component.text("oh god, I need to gamble, I'm getting the shakes...").color(TextColor.color(255, 0, 0))
+    );
+    player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 4, false, false));
+    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 2, false, false));
     alertedPlayers.add(player.getUniqueId());
   }
 
   public void removeAlert(Player player) {
     alertedPlayers.remove(player.getUniqueId());
+    player.removePotionEffect(PotionEffectType.CONFUSION);
+    player.removePotionEffect(PotionEffectType.SLOW);
+    player.sendActionBar(Component.text("ahh.. that's the last time I swear...").color(TextColor.color(204, 170, 0)));
   }
 
   @EventHandler
   public void onQuit(PlayerQuitEvent event) {
     alertedPlayers.remove(event.getPlayer().getUniqueId());
-    System.out.println("Removed - " + event.getPlayer().getName());
-    System.out.println("Size - " + alertedPlayers.size());
+    //System.out.println("Removed - " + event.getPlayer().getName());
+    //System.out.println("Size - " + alertedPlayers.size());
   }
 
   private void initStorageStuff() {
