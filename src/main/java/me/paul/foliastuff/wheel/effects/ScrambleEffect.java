@@ -67,15 +67,17 @@ public class ScrambleEffect extends WheelEffect implements Listener {
         spinner.sendMessage(Component.text(PREFIX).append(Component.text(" You suck. Good luck soldier... :>")));
 
         List<Block> blocks = getNearbySurfaceBlocks(spinner.getLocation(), 16, 4);
-        for (int i = 0; i < 6; i++) {
-          Block r = Util.getRandomEntry(blocks);
-          r.getWorld().spawn(r.getLocation().clone().add(0.5, 0, 0.5), Zombie.class, z -> {
-            z.setShouldBurnInDay(false);
-            z.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(10.0d);
-            z.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40.0d);
-            z.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.45d);
-            z.setTarget(spinner);
-          });
+        if(!blocks.isEmpty()) {
+          for (int i = 0; i < 6; i++) {
+            Block r = Util.getRandomEntry(blocks);
+            r.getWorld().spawn(r.getLocation().clone().add(0.5, 0, 0.5), Zombie.class, z -> {
+              z.setShouldBurnInDay(false);
+              z.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(10.0d);
+              z.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(40.0d);
+              z.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.45d);
+              z.setTarget(spinner);
+            });
+          }
         }
       }
 

@@ -3,7 +3,7 @@ version: '1.1'
 main: 'me.paul.foliastuff.other.FoliaStuff'
 description: Wheel, Cases, Goated on the Sticks
 folia-supported: true
-load: STARTUP
+load: POSTWORLD
 api-version: '1.20'
 bootstrapper: me.paul.foliastuff.other.FoliaBootstrapper
 softdepend: [PlaceholderAPI]

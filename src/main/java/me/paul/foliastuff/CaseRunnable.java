@@ -46,7 +46,7 @@ public class CaseRunnable implements Runnable {
 
   protected CaseItem winningItem;
   protected final ItemStack winningItemStack;
-  private static final int WINNING_TICKET = 108; // 102 = folia, 100 = paper?
+  private static final int WINNING_TICKET = 106; // 102 = folia, 100 = paper?
   private Item winningItemInstance;
   protected CompletableFuture<Pair<CaseItem, ItemStack>> future;
 
@@ -136,7 +136,7 @@ public class CaseRunnable implements Runnable {
       for (int i = itemCycle.size() - 1; i >= 0; i--) {
         Item item = itemCycle.get(i);
         item.setVelocity(speed);
-        if(!checkItem(item))
+        if (!checkItem(item))
           updateBlock(item, true);
       }
 
@@ -161,7 +161,7 @@ public class CaseRunnable implements Runnable {
       Item item = itemCycle.get(i);
       item.setVelocity(speed);
       // mark for removal
-      if(!checkItem(item))
+      if (!checkItem(item))
         updateBlock(item, false);
     }
 
@@ -198,7 +198,7 @@ public class CaseRunnable implements Runnable {
       // need to arbitarily insert the pre-chosen item into the list
       // so it appears in the middle
       // FUCK YOU STOP SPAMMING MY CONSOLE
-      // System.out.println("spawning @ " + ticks + " winner: " + WINNING_TICKET);
+      System.out.println("spawning @ " + ticks + " winner: " + WINNING_TICKET);
       boolean winner = ticks == WINNING_TICKET;
       Item it = drop(winner ? winningItem : caseInst.generateItem(true), -((MAX_ITEMS / 2)), winner);
       if (winner)
@@ -213,7 +213,7 @@ public class CaseRunnable implements Runnable {
   }
 
   private boolean checkIsWithinCenter(Item item) {
-    if(item == null) {
+    if (item == null) {
       return false;
     }
 

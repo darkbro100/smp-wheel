@@ -29,6 +29,8 @@ public class CasePlaceholders extends PlaceholderExpansion {
 
   @Override
   public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
+    System.out.println("onREquest called with params: " + params);
+
     if (params.equalsIgnoreCase("name")) {
       return player.getName();
     } else if (params.equalsIgnoreCase("player_total_opens")) {
