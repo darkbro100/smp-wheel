@@ -21,6 +21,10 @@ repositories {
   mavenLocal()
 
   maven {
+    url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+  }
+
+  maven {
     url = uri("https://oss.sonatype.org/content/groups/public/")
   }
 
@@ -39,6 +43,7 @@ dependencies {
   testCompileOnly ("org.projectlombok:lombok:1.18.28")
   testAnnotationProcessor ("org.projectlombok:lombok:1.18.28")
 
+  compileOnly("me.clip:placeholderapi:2.11.6")
   compileOnly("io.github.miniplaceholders:miniplaceholders-api:2.1.0")
 }
 

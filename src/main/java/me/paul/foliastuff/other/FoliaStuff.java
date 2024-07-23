@@ -163,6 +163,10 @@ public final class FoliaStuff extends JavaPlugin implements Listener {
   }
 
   public void registerExpansion() {
+    if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) { //
+      new CasePlaceholders().register();
+    }
+
     final Expansion.Builder expansionBuilder = Expansion.builder("case")
       .filter(Player.class)
       .audiencePlaceholder("name", (audience, ctx, queue) -> {

@@ -6,6 +6,7 @@ folia-supported: true
 load: STARTUP
 api-version: '1.20'
 bootstrapper: me.paul.foliastuff.other.FoliaBootstrapper
+softdepend: [PlaceholderAPI]
 
 authors:
   - paulyg
