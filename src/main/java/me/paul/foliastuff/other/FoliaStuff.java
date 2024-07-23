@@ -173,10 +173,6 @@ public final class FoliaStuff extends JavaPlugin implements Listener {
   }
 
   public void registerExpansion() {
-    for(int i = 0; i < 100; i++) {
-      getLogger().info("Registering expansion");
-    }
-
     getLogger().info("Registering expansion");
 
     if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) { //

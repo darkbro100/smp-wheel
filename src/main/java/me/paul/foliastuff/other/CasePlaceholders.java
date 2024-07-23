@@ -12,9 +12,21 @@ import org.jetbrains.annotations.Nullable;
 import java.text.DecimalFormat;
 
 public class CasePlaceholders extends PlaceholderExpansion {
+
+  /**
+   * This method should always return true unless we
+   * have a dependency we need to make sure is on the server
+   * for our placeholders to work!
+   * This expansion does not require a dependency so we will always return true
+   */
+  @Override
+  public boolean canRegister() {
+    return true;
+  }
+
   @Override
   public @NotNull String getIdentifier() {
-    return "placeholder_cases";
+    return "wheel";
   }
 
   @Override
@@ -28,7 +40,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
   }
 
   @Override
-  public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
+  public @Nullable String onRequest(final OfflinePlayer player, @NotNull String params) {
     System.out.println("onREquest called with params: " + params);
 
     if (params.equalsIgnoreCase("name")) {
@@ -38,7 +50,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
       return Util.format(stats.totalOpens());
     } else if (params.equalsIgnoreCase("total_emeralds_spent")) {
       CaseStats stats = CaseStats.get(player.getUniqueId());
-      Util.format(stats.totalOpens() * 3);
+      return Util.format(stats.totalOpens() * 3);
     } else if (params.equalsIgnoreCase("total_opens")) {
       int total = 0;
       for (CaseStats stats : CaseStats.getAll())
