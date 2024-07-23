@@ -1,11 +1,15 @@
 package me.paul.foliastuff.other;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.paul.foliastuff.CaseItem;
 import me.paul.foliastuff.CaseStats;
 import me.paul.foliastuff.util.Util;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.text.DecimalFormat;
 
 public class CasePlaceholders extends PlaceholderExpansion {
   @Override
@@ -43,6 +47,36 @@ public class CasePlaceholders extends PlaceholderExpansion {
       for (CaseStats stats : CaseStats.getAll())
         total += (stats.totalOpens() * 3);
       return Util.format(total);
+    }
+
+    for (CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values()) {
+      String name = "total_" + rarity.name().toLowerCase() + "_opens";
+      String name2 = rarity.name().toLowerCase() + "_total_opens";
+      String name3 = "total_" + rarity.name().toLowerCase() + "_percentage";
+      String name4 = rarity.name().toLowerCase() + "_total_percentage";
+
+      if(params.equalsIgnoreCase(name)) {
+        CaseStats stats = CaseStats.get(player.getUniqueId());
+        return Util.format(stats.getCaseOpens(rarity));
+      } else if(params.equalsIgnoreCase(name2)) {
+        int total = 0;
+        for (CaseStats stats : CaseStats.getAll())
+          total += stats.getCaseOpens(rarity);
+
+        return Util.format(total);
+      } else if(params.equalsIgnoreCase(name3)) {
+        CaseStats stats = CaseStats.get(player.getUniqueId());
+
+        DecimalFormat df = new DecimalFormat("##.##");
+        return df.format(stats.getChance(rarity) * 100);
+      } else if(params.equalsIgnoreCase(name4)) {
+        double total = 0;
+        for (CaseStats stats : CaseStats.getAll())
+          total += stats.getChance(rarity);
+
+        DecimalFormat df = new DecimalFormat("##.##");
+        return df.format(total * 100);
+      }
     }
 
     return null;
