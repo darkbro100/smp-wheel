@@ -1,4 +1,5 @@
-package me.paul.foliastuff.wheel.effects;//package me.paul.lads.wheel.effects;
+//package me.paul.foliastuff.wheel.effects;
+//package me.paul.lads.wheel.effects;
 //
 //import java.util.ArrayList;
 //import java.util.List;

@@ -102,7 +102,7 @@ public final class FoliaStuff extends JavaPlugin implements Listener {
     Sync.get().interval(1).delay(1).run(this::checkPlayers);
   }
 
-  private static final Duration WHEEL_WAIT = Duration.minutes(0.5);
+  private static final Duration WHEEL_WAIT = Duration.hours(24);
 
   /**
    * Check if players have not spun the wheel in a while (24 hours)
@@ -127,7 +127,7 @@ public final class FoliaStuff extends JavaPlugin implements Listener {
   private final List<UUID> alertedPlayers = Lists.newArrayList();
 
   public void alertPlayer(Player player) {
-    player.sendMessage("You're feeling the need to gamble! Where's the wheel?!!");
+    player.sendMessage(Component.text("You're feeling sick! You need to spin the wheel!").color(TextColor.color(255, 0, 0)));
     player.sendActionBar(
       Component.text("oh god, I need to gamble, I'm getting the shakes...").color(TextColor.color(255, 0, 0))
     );

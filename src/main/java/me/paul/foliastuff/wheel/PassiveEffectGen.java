@@ -65,9 +65,9 @@ public class PassiveEffectGen {
       Location loc = p.getLocation();
       loc.setY(loc.getY() + 1.5);
       ItemStack diamonds = new ItemStack(Material.DIAMOND);
-      diamonds.setAmount(2);
+      diamonds.setAmount(1);
 
-      for (int i = 1; i < 25; i++) {
+      for (int i = 1; i < 10; i++) {
         Sync.get().delay(i * 20).run(() -> {
           launchFirework(loc);
           p.getWorld().dropItemNaturally(loc, diamonds);
@@ -82,7 +82,7 @@ public class PassiveEffectGen {
       ItemStack emerald = new ItemStack(Material.EMERALD);
       emerald.setAmount(2);
 
-      for (int i = 1; i < 25; i++) {
+      for (int i = 1; i < 20; i++) {
         Sync.get().delay(i * 20).run(() -> {
           launchFirework(loc);
           p.getWorld().dropItemNaturally(loc, emerald);

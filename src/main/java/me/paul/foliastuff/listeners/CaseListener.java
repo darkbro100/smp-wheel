@@ -149,8 +149,8 @@ public class CaseListener implements Listener {
 
       // can the player afford a spin?
       ItemStack hand = player.getInventory().getItemInMainHand();
-      if (hand.getType() != Material.EMERALD || hand.getAmount() < 3) {
-        player.sendMessage(Component.text("You need at least 3 emeralds to spin a case!", NamedTextColor.RED));
+      if (hand.getType() != Material.DIAMOND || hand.getAmount() < 1) {
+        player.sendMessage(Component.text("You need at least 1 diamond to spin a case!", NamedTextColor.RED));
         return;
       }
 
