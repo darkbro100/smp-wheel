@@ -41,7 +41,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
 
   @Override
   public @Nullable String onRequest(final OfflinePlayer player, @NotNull String params) {
-    System.out.println("onREquest called with params: " + params);
+//    System.out.println("onREquest called with params: " + params);
 
     if (params.equalsIgnoreCase("name")) {
       return player.getName();
@@ -68,6 +68,8 @@ public class CasePlaceholders extends PlaceholderExpansion {
       String name2 = rarity.name().toLowerCase() + "_total_opens";
       String name3 = "total_" + rarity.name().toLowerCase() + "_percentage";
       String name4 = rarity.name().toLowerCase() + "_total_percentage";
+
+      System.out.println("Checking for " + name + " or " + name2 + " or " + name3 + " or " + name4);
 
       if(params.equalsIgnoreCase(name)) {
         CaseStats stats = CaseStats.get(player.getUniqueId());
