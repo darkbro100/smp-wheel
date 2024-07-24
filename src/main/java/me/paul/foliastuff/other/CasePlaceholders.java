@@ -72,14 +72,14 @@ public class CasePlaceholders extends PlaceholderExpansion {
       String name4 = rarity.name().toLowerCase() + "_total_percentage";
 
       if(params.equalsIgnoreCase(name)) {
-        CaseStats stats = CaseStats.get(player.getUniqueId());
-        return Util.format(stats.getCaseOpens(rarity));
-      } else if(params.equalsIgnoreCase(name2)) {
         int total = 0;
         for (CaseStats stats : CaseStats.getAll())
           total += stats.getCaseOpens(rarity);
 
         return Util.format(total);
+      } else if(params.equalsIgnoreCase(name2)) {
+        CaseStats stats = CaseStats.get(player.getUniqueId());
+        return Util.format(stats.getCaseOpens(rarity));
       } else if(params.equalsIgnoreCase(name3)) {
         double totalRarityOpens = 0;
         double total = 0;
