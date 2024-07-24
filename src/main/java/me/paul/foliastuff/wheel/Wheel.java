@@ -296,7 +296,9 @@ public class Wheel implements Runnable {
       celebrate();
 
       // passive effect
-      applyPassiveEffect(player);
+      if (player != null) {
+        applyPassiveEffect(player.getPlayer());
+      }
       return;
     }
 

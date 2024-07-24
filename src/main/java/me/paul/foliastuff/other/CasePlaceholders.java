@@ -41,7 +41,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
 
   @Override
   public @Nullable String onRequest(final OfflinePlayer player, @NotNull String params) {
-    System.out.println("onREquest called with params: " + params);
+    //System.out.println("onREquest called with params: " + params);
 
     if (params.equalsIgnoreCase("name")) {
       return player.getName();
@@ -49,6 +49,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
       CaseStats stats = CaseStats.get(player.getUniqueId());
       return Util.format(stats.totalOpens());
     } else if (params.equalsIgnoreCase("total_emeralds_spent")) {
+      //System.out.println("HELLO");
       CaseStats stats = CaseStats.get(player.getUniqueId());
       return Util.format(stats.totalOpens() * 3);
     } else if (params.equalsIgnoreCase("total_opens")) {
@@ -66,6 +67,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
     for (CaseItem.CaseRarity rarity : CaseItem.CaseRarity.values()) {
       String name = "total_" + rarity.name().toLowerCase() + "_opens";
       String name2 = rarity.name().toLowerCase() + "_total_opens";
+      //System.out.println(name2);
       String name3 = "total_" + rarity.name().toLowerCase() + "_percentage";
       String name4 = rarity.name().toLowerCase() + "_total_percentage";
 

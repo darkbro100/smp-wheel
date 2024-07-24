@@ -1,4 +1,4 @@
-package me.paul.foliastuff.wheel.effects;//package me.paul.lads.wheel.effects;
+//package me.paul.foliastuff.wheel.effects;//package me.paul.lads.wheel.effects;
 //
 //import java.util.Arrays;
 //import java.util.List;
@@ -20,7 +20,7 @@ package me.paul.foliastuff.wheel.effects;//package me.paul.lads.wheel.effects;
 //
 //	private List<String> tools = Arrays.asList("pickaxe", "hoe", "axe", "shovel", "sword");
 //	String prefix = ChatColor.GRAY + ChatColor.ITALIC.toString() + "[The Wacky" + ChatColor.RED + ChatColor.ITALIC + " WHEEL" + ChatColor.GRAY + ChatColor.ITALIC + "] -> me:";
-//	
+//
 //	@Override
 //	public void play(Player spinner, Wheel spun) {
 //		PlayerInventory pi = spinner.getInventory();
@@ -28,16 +28,16 @@ package me.paul.foliastuff.wheel.effects;//package me.paul.lads.wheel.effects;
 //
 //		for (int i = 0; i < contents.length; i++) {
 //			ItemStack it = contents[i];
-//			
+//
 //			if(it == null)
 //				continue;
-//			
-//			
+//
+//
 //			String name = it.getType().name();
 //			String[] parts = name.split("_");
 //			if(parts.length != 2)
 //				continue;
-//			
+//
 //			String tool = parts[1].toLowerCase();
 //			if(tools.contains(tool)) {
 //				//Turn the tool to stone
