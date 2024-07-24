@@ -51,7 +51,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
     } else if (params.equalsIgnoreCase("total_emeralds_spent")) {
       //System.out.println("HELLO");
       CaseStats stats = CaseStats.get(player.getUniqueId());
-      return Util.format(stats.totalOpens() * 3);
+      return Util.format(stats.totalOpens() * 1);
     } else if (params.equalsIgnoreCase("total_opens")) {
       int total = 0;
       for (CaseStats stats : CaseStats.getAll())
@@ -60,7 +60,7 @@ public class CasePlaceholders extends PlaceholderExpansion {
     } else if (params.equalsIgnoreCase("server_total_emeralds_spent")) {
       int total = 0;
       for (CaseStats stats : CaseStats.getAll())
-        total += (stats.totalOpens() * 3);
+        total += (stats.totalOpens() * 1);
       return Util.format(total);
     }
 

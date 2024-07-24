@@ -29,6 +29,8 @@ import static me.paul.foliastuff.wheel.PassiveEffectGen.applyPassiveEffect;
 @Getter
 public class Wheel implements Runnable {
 
+  public static final Duration WHEEL_COOLDOWN = Duration.hours(1);
+
   /**
    * Ideal offset: 1-2
    * Ideal size: 10-12
@@ -133,6 +135,15 @@ public class Wheel implements Runnable {
 
     // ensure this gets updated/saved
     CaseStats stats = CaseStats.get(opener.getUniqueId());
+    if(stats.getLastWheelSpin() != null) {
+      Date last = stats.getLastWheelSpin();
+      Date now = new Date();
+      long diff = now.getTime() - last.getTime();
+      if (diff < WHEEL_COOLDOWN.ms()) {
+        return false;
+      }
+    }
+
     stats.setLastWheelSpin(Timestamp.from(Instant.now()));
     SettingsManager.getInstance().save(stats);
 

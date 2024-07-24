@@ -165,7 +165,7 @@ public class CaseListener implements Listener {
       }
 
       // remove 3 emeralds from the player's inventory
-      hand.subtract(3);
+      hand.subtract(1);
 
       CompletableFuture<Pair<CaseItem, ItemStack>> future = new CompletableFuture<>();
       caseIns.spin(player, future);

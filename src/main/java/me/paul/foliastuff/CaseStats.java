@@ -71,6 +71,11 @@ public class CaseStats {
   }
 
   public double getChance(CaseItem.CaseRarity rarity) {
+    if(totalOpens() == 0)
+      return 0.0;
+    if(getCaseOpens(rarity) == 0)
+      return 0.0;
+
     return (double) getCaseOpens(rarity) / totalOpens();
   }
 
