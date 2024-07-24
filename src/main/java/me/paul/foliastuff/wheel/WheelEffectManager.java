@@ -84,7 +84,7 @@ public class WheelEffectManager {
        Location getfucked = new Location(spinner.getWorld(), 2294, 129, 2073);
        spinner.teleport(getfucked);
        spinner.sendMessage(Component.text("Have a nice swim!").color(TextColor.color(0, 128, 255)));
-       Bukkit.broadcast(Component.text(spinner.getName() + "has been lost at sea...").color(TextColor.color(0, 128, 255)));
+       Bukkit.broadcast(Component.text(spinner.getName() + " has been lost at sea...").color(TextColor.color(0, 128, 255)));
       }
     });
 
