@@ -81,17 +81,22 @@ public class CasePlaceholders extends PlaceholderExpansion {
 
         return Util.format(total);
       } else if(params.equalsIgnoreCase(name3)) {
-        CaseStats stats = CaseStats.get(player.getUniqueId());
+        double totalRarityOpens = 0;
+        double total = 0;
+        for (CaseStats caseStats : CaseStats.getAll()) {
+          total += caseStats.totalOpens();
+          totalRarityOpens += caseStats.getCaseOpens(rarity);
+        }
+        double chance = totalRarityOpens / total;
+        if(totalRarityOpens == 0 || total == 0)
+          chance = 0;
 
+        DecimalFormat df = new DecimalFormat("##.##");
+        return df.format(chance * 100);
+      } else if(params.equalsIgnoreCase(name4)) {
+        CaseStats stats = CaseStats.get(player.getUniqueId());
         DecimalFormat df = new DecimalFormat("##.##");
         return df.format(stats.getChance(rarity) * 100);
-      } else if(params.equalsIgnoreCase(name4)) {
-        double total = 0;
-        for (CaseStats stats : CaseStats.getAll())
-          total += stats.getChance(rarity);
-
-        DecimalFormat df = new DecimalFormat("##.##");
-        return df.format(total * 100);
       }
     }
 
