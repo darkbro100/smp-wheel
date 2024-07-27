@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -74,6 +75,28 @@ public class WheelEffectManager {
           });
         }
         Bukkit.broadcast(Component.text(spinner.getName() + " bought everyone a hot balloon ride, except there's no balloon. And also no parachutes.").color(TextColor.color(0, 255, 120)));
+      }
+    });
+
+    //standed at sea
+    effects.add(new WheelEffect() {
+      public void play(Player spinner, Wheel spun) {
+       Location getfucked = new Location(spinner.getWorld(), 2294, 129, 2073);
+       spinner.teleport(getfucked);
+       spinner.sendMessage(Component.text("Have a nice swim!").color(TextColor.color(0, 128, 255)));
+       Bukkit.broadcast(Component.text(spinner.getName() + " has been lost at sea...").color(TextColor.color(0, 128, 255)));
+      }
+    });
+
+    //block of doom
+    effects.add(new WheelEffect() {
+      public void play(Player spinner, Wheel spun) {
+       Location getfucked = new Location(spinner.getWorld(), -25, 312, 380);
+        for (int i = 0; i < 5; i++) {
+          Sync.get(spinner).delay(i * 5).run(() -> spinner.playSound(spinner.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 10f, 0f));
+        }
+       spinner.sendTitle(ChatColor.RED + ChatColor.BOLD.toString() + "DO NOT FUCKING MOVE", ChatColor.WHITE + "You are about to teleport...", 10, 20*3, 10);
+        Sync.get(spinner).delay(Duration.seconds(5)).run(() -> spinner.teleport(getfucked));
       }
     });
 
