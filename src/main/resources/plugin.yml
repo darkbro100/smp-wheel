@@ -13,6 +13,8 @@ authors:
   - paulyg
 
 commands:
+  spawn:
+    description: TP to spawn
   home:
     description: TP to home
   sethome:

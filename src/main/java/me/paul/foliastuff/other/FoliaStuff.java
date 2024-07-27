@@ -77,6 +77,7 @@ public final class FoliaStuff extends JavaPlugin implements Listener {
 
     getCommand("home").setExecutor(new HomeCommand());
     getCommand("sethome").setExecutor(new SetHomeCommand());
+    getCommand("spawn").setExecutor(new SpawnCommand());
 
     instance = this;
 
