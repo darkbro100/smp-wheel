@@ -23,6 +23,7 @@ public class RandomMobEffect extends WheelEffect implements Listener {
     // weighted mobs
     Map<EntityType, Integer> mobsWeighted = new HashMap<>();
     mobsWeighted.put(EntityType.ZOMBIE, 20);
+    mobsWeighted.put(EntityType.CREEPER, 10);
     mobsWeighted.put(EntityType.SKELETON, 20);
     mobsWeighted.put(EntityType.WITCH, 20);
     mobsWeighted.put(EntityType.HOGLIN, 10);
@@ -35,14 +36,18 @@ public class RandomMobEffect extends WheelEffect implements Listener {
 
     Random random = new Random();
 
-    //fuck text components we do it old school
-    Bukkit.broadcastMessage(ChatColor.GREEN.toString() + spinner + " just started a " + ChatColor.BLUE + ChatColor.BOLD.toString() + "MOB FRENZY!!");
+    //dramatic effect
+    Location strike = new Location(spinner.getWorld(), 0, 66, 0);
+    Bukkit.getWorld("world").strikeLightning(strike);
+    Bukkit.broadcastMessage(ChatColor.GREEN + spinner.getName() + " just started a " + ChatColor.BLUE + ChatColor.BOLD.toString() + "MOB FRENZY!!");
     Bukkit.getOnlinePlayers().forEach(p -> {
       p.playSound(p.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1f, 1f);
     });
-    //spawn mobs on everyone for 2 minutes every 20 seconds (120 / 20 = 6)
 
-    Sync.get(spinner).interval(Duration.seconds(20)).cycles(6).run(() -> {
+    //spawn mobs on everyone for 2 minutes every 20 seconds (120 / 20 = 6)
+    Sync.get(spinner).interval(Duration.seconds(20)).cycles(6).onCycleEnd(() -> {
+      Bukkit.broadcastMessage(ChatColor.BLUE + "Mob frenzy is over :(");
+    }).run(() -> {
       Bukkit.getOnlinePlayers().forEach(p -> {
         Location loc = p.getLocation().clone().add(random.nextInt(3) - 1, random.nextInt(3) - 1, random.nextInt(3) - 1);
         EntityType randomMob = getRandomMob(mobsWeighted, random);
