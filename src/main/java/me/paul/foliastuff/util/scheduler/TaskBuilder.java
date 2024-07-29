@@ -151,13 +151,7 @@ public class TaskBuilder implements Runnable {
   }
 
   public Object run(Runnable runnable) {
-    if (onCycleEnd != null) {
-      this.runnable = () -> {
-        runnable.run();
-        onCycleEnd.run();
-      };
-    } else
-      this.runnable = runnable;
+    this.runnable = runnable;
 
     if (isFoliaSupported()) {
       return foliaTaskSetup();
@@ -230,6 +224,10 @@ public class TaskBuilder implements Runnable {
 
       if (hardRun)
         hardRuns.remove(this);
+
+      if(onCycleEnd != null) {
+        onCycleEnd.run();
+      }
     }
 
     if (cycles == 0 && hardRun)
