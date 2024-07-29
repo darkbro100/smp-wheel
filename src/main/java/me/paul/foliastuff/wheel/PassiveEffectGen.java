@@ -67,7 +67,7 @@ public class PassiveEffectGen {
       ItemStack diamonds = new ItemStack(Material.DIAMOND);
       diamonds.setAmount(1);
 
-      for (int i = 1; i < 10; i++) {
+      for (int i = 1; i < 11; i++) {
         Sync.get().delay(i * 20).run(() -> {
           launchFirework(loc);
           p.getWorld().dropItemNaturally(loc, diamonds);
