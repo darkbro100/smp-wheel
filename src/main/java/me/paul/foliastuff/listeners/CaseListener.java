@@ -149,8 +149,8 @@ public class CaseListener implements Listener {
 
       // can the player afford a spin?
       ItemStack hand = player.getInventory().getItemInMainHand();
-      if (hand.getType() != Material.DIAMOND || hand.getAmount() < 1) {
-        player.sendMessage(Component.text("You need at least 1 diamond to spin a case!", NamedTextColor.RED));
+      if (hand.getType() != Material.DIAMOND || hand.getAmount() < 2) {
+        player.sendMessage(Component.text("You need at least 2 diamond to spin a case!", NamedTextColor.RED));
         return;
       }
 
@@ -165,7 +165,7 @@ public class CaseListener implements Listener {
       }
 
       // remove 3 emeralds from the player's inventory
-      hand.subtract(1);
+      hand.subtract(2);
 
       CompletableFuture<Pair<CaseItem, ItemStack>> future = new CompletableFuture<>();
       caseIns.spin(player, future);
