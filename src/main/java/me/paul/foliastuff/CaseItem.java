@@ -7,15 +7,13 @@ import me.paul.foliastuff.util.Util;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CaseItem {
 
@@ -56,8 +54,25 @@ public class CaseItem {
 
     ItemStack it = Util.getRandomEntry(drops).clone();
     if (it.getType() == Material.ENCHANTED_BOOK) {
-      Enchantment random = Util.getRandomEntry(Enchantment.values());
-      it.addUnsafeEnchantment(random, Util.random(1, random.getMaxLevel()));
+      ItemStack ret = new ItemStack(Material.ENCHANTED_BOOK);
+      Random rnd = new Random();
+      Iterator<Enchantment> itr = Registry.ENCHANTMENT.iterator();
+      Enchantment res = null;
+      float highest = 0;
+
+      while(itr.hasNext()) {
+        Enchantment ench = itr.next();
+        if (rnd.nextFloat() > highest) {
+          highest = rnd.nextFloat();
+          res = ench;
+        }
+      }
+
+      if(res != null) {
+        ret.addUnsafeEnchantment(res, Util.random(1, res.getMaxLevel()));
+        return ret;
+      }
+
     } else if (it.getType() == Material.PLAYER_HEAD) {
       SkullMeta meta = (SkullMeta) it.getItemMeta();
       meta.setPlayerProfile(player.getPlayerProfile());
