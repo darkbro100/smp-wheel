@@ -44,8 +44,8 @@ public class RandomMobEffect extends WheelEffect implements Listener {
       p.playSound(p.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1f, 1f);
     });
 
-    //spawn mobs on everyone for 2 minutes every 20 seconds (120 / 20 = 6)
-    Sync.get(spinner).interval(Duration.seconds(20)).cycles(6).onCycleEnd(() -> {
+    //spawn mobs on everyone for 2 minutes every 10 seconds (120 / 10 = 12)
+    Sync.get(spinner).interval(Duration.seconds(10).toTicks()).cycles(12).onCycleEnd(() -> {
       Bukkit.broadcastMessage(ChatColor.BLUE + "Mob frenzy is over :(");
     }).run(() -> {
       Bukkit.getOnlinePlayers().forEach(p -> {
