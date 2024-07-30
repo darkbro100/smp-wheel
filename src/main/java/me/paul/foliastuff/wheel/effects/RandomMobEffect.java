@@ -49,7 +49,7 @@ public class RandomMobEffect extends WheelEffect implements Listener {
       Bukkit.broadcastMessage(ChatColor.BLUE + "Mob frenzy is over :(");
     }).run(() -> {
       Bukkit.getOnlinePlayers().forEach(p -> {
-        Location loc = p.getLocation().clone().add(random.nextInt(3) - 1, random.nextInt(3) - 1, random.nextInt(3) - 1);
+        Location loc = p.getLocation().clone().add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
         EntityType randomMob = getRandomMob(mobsWeighted, random);
         Bukkit.getWorld(p.getWorld().getName()).spawnEntity(loc, randomMob);
       });
